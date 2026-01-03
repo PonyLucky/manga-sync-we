@@ -1,0 +1,254 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.manga-details {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  &__content {
+    flex: 1;
+    max-width: $breakpoint-xl;
+    width: 100%;
+    margin: 0 auto;
+    padding: $spacing-xl $spacing-lg;
+  }
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-sm;
+    color: $color-text-secondary;
+    font-size: 0.9375rem;
+    margin-bottom: $spacing-xl;
+    @include smooth-transition;
+
+    &:hover {
+      color: $color-text-primary;
+    }
+  }
+
+  &__skeleton {
+    display: flex;
+    gap: $spacing-xl;
+
+    &-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-md;
+    }
+  }
+
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+    animation: fade-in $transition-normal ease-out;
+
+    @media (min-width: $breakpoint-md) {
+      flex-direction: row;
+    }
+  }
+
+  &__cover-container {
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+
+    @media (min-width: $breakpoint-md) {
+      margin: 0;
+    }
+  }
+
+  &__cover {
+    width: 100%;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-lg;
+    @include glow;
+  }
+
+  &__info {
+    flex: 1;
+  }
+
+  &__title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: $spacing-lg;
+    @include gradient-text;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-xl;
+  }
+
+  &__section {
+    margin-bottom: $spacing-xl;
+
+    &-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: $spacing-md;
+
+      h2 {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: $color-text-primary;
+      }
+    }
+  }
+
+  &__empty {
+    color: $color-text-muted;
+    font-size: 0.9375rem;
+    padding: $spacing-lg;
+    text-align: center;
+    background: $color-bg-card;
+    border-radius: $radius-md;
+    border: 1px solid $color-border;
+  }
+
+  &__sources {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__source {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-md;
+    background: $color-bg-card;
+    border-radius: $radius-md;
+    border: 1px solid $color-border;
+    @include smooth-transition;
+
+    &:hover {
+      border-color: $color-border-hover;
+    }
+
+    &-info {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-xs;
+    }
+
+    &-domain {
+      font-weight: 500;
+      color: $color-accent-primary;
+    }
+
+    &-path {
+      font-size: 0.875rem;
+      color: $color-text-muted;
+      font-family: monospace;
+    }
+
+    &-actions {
+      display: flex;
+      gap: $spacing-xs;
+    }
+  }
+
+  &__history {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__chapter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-md;
+    background: $color-bg-card;
+    border-radius: $radius-md;
+    border: 1px solid $color-border;
+
+    &-number {
+      font-weight: 500;
+      color: $color-text-primary;
+    }
+
+    &-date {
+      font-size: 0.875rem;
+      color: $color-text-muted;
+    }
+  }
+
+  &__delete-modal {
+    p {
+      color: $color-text-secondary;
+      margin-bottom: $spacing-lg;
+
+      strong {
+        color: $color-text-primary;
+      }
+    }
+  }
+
+  &__delete-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-sm;
+  }
+
+  &__add-source-modal {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  &__add-source-field {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+
+    label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: $color-text-secondary;
+    }
+
+    select {
+      padding: $spacing-sm $spacing-md;
+      background: $color-bg-glass;
+      border: 1px solid $color-border;
+      border-radius: $radius-md;
+      color: $color-text-primary;
+      font-size: 0.9375rem;
+      @include smooth-transition;
+
+      &:hover {
+        border-color: $color-border-hover;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $color-accent-primary;
+        box-shadow: 0 0 0 3px rgba($color-accent-primary, 0.1);
+      }
+
+      option {
+        background: $color-bg-primary;
+        color: $color-text-primary;
+      }
+    }
+  }
+
+  &__add-source-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-sm;
+    margin-top: $spacing-sm;
+  }
+}

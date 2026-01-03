@@ -1,0 +1,88 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: $z-dropdown;
+  @include glass;
+  border-bottom: 1px solid $color-border;
+
+  &__container {
+    max-width: $breakpoint-xl;
+    margin: 0 auto;
+    padding: $spacing-md $spacing-lg;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-lg;
+  }
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    text-decoration: none;
+  }
+
+  &__logo-text {
+    font-size: 1.25rem;
+    font-weight: 700;
+    @include gradient-text;
+  }
+
+  &__nav {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__nav-link {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-sm $spacing-md;
+    color: $color-text-secondary;
+    border-radius: $radius-md;
+    @include smooth-transition;
+    text-decoration: none;
+
+    &:hover {
+      color: $color-text-primary;
+      background: $color-bg-hover;
+    }
+
+    &--active {
+      color: $color-accent-primary;
+      background: rgba($color-accent-primary, 0.1);
+
+      &:hover {
+        color: $color-accent-primary;
+        background: rgba($color-accent-primary, 0.15);
+      }
+    }
+
+    span {
+      font-size: 0.9375rem;
+      font-weight: 500;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .header {
+    &__nav-link span {
+      display: none;
+    }
+
+    &__actions .button span {
+      display: none;
+    }
+  }
+}

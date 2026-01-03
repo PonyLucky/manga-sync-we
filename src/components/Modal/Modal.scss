@@ -1,0 +1,60 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: $z-modal;
+  padding: $spacing-lg;
+  animation: fade-in $transition-fast ease-out;
+}
+
+.modal {
+  @include glass;
+  background: $color-bg-primary;
+  border-radius: $radius-xl;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  animation: scale-in $transition-normal ease-out;
+
+  &--sm {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  &--md {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  &--lg {
+    width: 100%;
+    max-width: 720px;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-lg;
+    border-bottom: 1px solid $color-border;
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $color-text-primary;
+  }
+
+  &__content {
+    padding: $spacing-lg;
+    overflow-y: auto;
+    @include custom-scrollbar;
+  }
+}

@@ -1,0 +1,48 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.skeleton {
+  @include shimmer;
+  border-radius: $radius-sm;
+
+  &--text {
+    height: 1rem;
+    width: 100%;
+  }
+
+  &--rectangular {
+    border-radius: $radius-md;
+  }
+
+  &--circular {
+    border-radius: $radius-full;
+  }
+
+  &--card {
+    border-radius: $radius-lg;
+    aspect-ratio: 2 / 3;
+  }
+}
+
+.manga-card-skeleton {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  border: 1px solid $color-border;
+
+  &__image {
+    aspect-ratio: 2 / 3;
+    @include shimmer;
+  }
+
+  &__info {
+    padding: $spacing-md;
+  }
+
+  &__title {
+    height: 1rem;
+    width: 80%;
+    @include shimmer;
+    border-radius: $radius-sm;
+  }
+}

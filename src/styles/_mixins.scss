@@ -1,0 +1,185 @@
+@use 'variables' as *;
+
+// Gradient text
+@mixin gradient-text {
+  background: linear-gradient(135deg, $color-accent-gradient-start, $color-accent-gradient-end);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// Glassmorphism
+@mixin glass {
+  background: $color-bg-glass;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid $color-border;
+}
+
+// Animated gradient border
+@mixin gradient-border($border-width: 2px) {
+  position: relative;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: $border-width;
+    background: conic-gradient(
+      from 0deg,
+      $color-accent-gradient-start,
+      $color-accent-gradient-end,
+      $color-accent-gradient-start
+    );
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+    animation: rotate-gradient 3s linear infinite;
+  }
+}
+
+// Glow effect
+@mixin glow($color: $color-accent-primary) {
+  box-shadow: 0 0 20px rgba($color, 0.3);
+
+  &:hover {
+    box-shadow: 0 0 30px rgba($color, 0.5);
+  }
+}
+
+// Shimmer loading effect
+@mixin shimmer {
+  background: linear-gradient(
+    90deg,
+    $color-bg-card 0%,
+    rgba(51, 65, 85, 0.5) 50%,
+    $color-bg-card 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+// Smooth transition
+@mixin smooth-transition($properties...) {
+  @if length($properties) == 0 {
+    transition: all $transition-normal;
+  } @else {
+    $transition-list: ();
+    @each $property in $properties {
+      $transition-list: append($transition-list, $property $transition-normal, comma);
+    }
+    transition: $transition-list;
+  }
+}
+
+// Card hover effect
+@mixin card-hover {
+  @include smooth-transition;
+
+  &:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: $shadow-lg, $shadow-glow;
+  }
+}
+
+// Focus ring
+@mixin focus-ring {
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px $color-bg-primary, 0 0 0 4px $color-accent-primary;
+  }
+}
+
+// Scrollbar styling
+@mixin custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $color-bg-secondary;
+    border-radius: $radius-full;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $color-border;
+    border-radius: $radius-full;
+
+    &:hover {
+      background: $color-border-hover;
+    }
+  }
+}
+
+// Keyframes
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes rotate-gradient {
+  0% {
+    background: conic-gradient(
+      from 0deg,
+      $color-accent-gradient-start,
+      $color-accent-gradient-end,
+      $color-accent-gradient-start
+    );
+  }
+  100% {
+    background: conic-gradient(
+      from 360deg,
+      $color-accent-gradient-start,
+      $color-accent-gradient-end,
+      $color-accent-gradient-start
+    );
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

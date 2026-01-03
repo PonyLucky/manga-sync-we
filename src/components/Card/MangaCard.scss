@@ -1,0 +1,97 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.manga-card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  cursor: pointer;
+  @include card-hover;
+  border: 1px solid $color-border;
+
+  &:hover {
+    border-color: $color-accent-primary;
+
+    .manga-card__overlay {
+      opacity: 1;
+    }
+
+    .manga-card__image {
+      transform: scale(1.05);
+    }
+  }
+
+  &__image-container {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    background: $color-bg-secondary;
+  }
+
+  &__skeleton {
+    position: absolute;
+    inset: 0;
+    @include shimmer;
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    @include smooth-transition(opacity, transform);
+
+    &--loaded {
+      opacity: 1;
+    }
+  }
+
+  &__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, $color-accent-gradient-start, $color-accent-gradient-end);
+
+    span {
+      font-size: 3rem;
+      font-weight: 700;
+      color: $color-text-primary;
+      text-transform: uppercase;
+    }
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    @include glass;
+    opacity: 0;
+    @include smooth-transition;
+  }
+
+  &__view-text {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $color-text-primary;
+    padding: $spacing-sm $spacing-md;
+    background: rgba($color-accent-primary, 0.8);
+    border-radius: $radius-full;
+  }
+
+  &__info {
+    padding: $spacing-md;
+  }
+
+  &__title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: $color-text-primary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
