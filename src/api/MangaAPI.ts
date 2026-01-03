@@ -109,8 +109,8 @@ export class MangaAPI {
   }
 
   // Settings endpoints
-  async getAllSettings(): Promise<ApiResponse<Setting[]>> {
-    return this.request<Setting[]>('get', '/setting');
+  async getAllSettings(): Promise<ApiResponse<Record<string, string>>> {
+    return this.request<Record<string, string>>('get', '/setting');
   }
 }
 

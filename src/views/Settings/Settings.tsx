@@ -56,7 +56,11 @@ export function Settings() {
     try {
       const response = await api.getAllSettings();
       if (response.status === 'success' && response.data) {
-        setSettings(response.data);
+        const settingsArray = Object.entries(response.data).map(([key, value]) => ({
+          key,
+          value: String(value),
+        }));
+        setSettings(settingsArray);
       }
     } catch {
       showToast('Failed to fetch settings', 'error');
