@@ -15,6 +15,7 @@ export function Settings() {
 
   const [websites, setWebsites] = useState<Website[]>([]);
   const [isLoadingWebsites, setIsLoadingWebsites] = useState(false);
+  const [deletingWebsiteId, setDeletingWebsiteId] = useState<number | null>(null);
   const [newDomain, setNewDomain] = useState('');
   const [isAddingDomain, setIsAddingDomain] = useState(false);
 
@@ -95,9 +96,10 @@ export function Settings() {
     try {
       const response = await api.createWebsite(newDomain);
       if (response.status === 'success' && response.data) {
-        setWebsites((prev) => [...prev, response.data!]);
         setNewDomain('');
         showToast('Website added successfully', 'success');
+        fetchWebsites();
+        fetchSettings();
       } else {
         showToast(response.message || 'Failed to add website', 'error');
       }
@@ -105,6 +107,25 @@ export function Settings() {
       showToast('Failed to add website', 'error');
     } finally {
       setIsAddingDomain(false);
+    }
+  };
+
+  const handleDeleteWebsite = async (id: number) => {
+    if (!api) return;
+
+    setDeletingWebsiteId(id);
+    try {
+      const response = await api.deleteWebsite(id);
+      if (response.status === 'success') {
+        setWebsites((prev) => prev.filter((w) => w.id !== id));
+        showToast('Website deleted successfully', 'success');
+      } else {
+        showToast(response.message || 'Failed to delete website', 'error');
+      }
+    } catch {
+      showToast('Failed to delete website', 'error');
+    } finally {
+      setDeletingWebsiteId(null);
     }
   };
 
@@ -217,7 +238,12 @@ export function Settings() {
                       <span className="settings__website-domain">
                         {website.domain}
                       </span>
-                      <Button variant="ghost" size="sm" disabled>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteWebsite(website.id)}
+                        loading={deletingWebsiteId === website.id}
+                      >
                         <Trash2 size={16} />
                       </Button>
                     </li>
