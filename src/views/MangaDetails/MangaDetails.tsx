@@ -7,6 +7,8 @@ import {
   ExternalLink,
   Clock,
   Globe,
+  BookOpen,
+  ChevronUp,
 } from 'lucide-react';
 import { useApi, useToast } from '@/context';
 import { Button, Header, Modal, Input, Skeleton } from '@/components';
@@ -24,6 +26,7 @@ export function MangaDetails() {
   const [history, setHistory] = useState<Chapter[]>([]);
   const [websites, setWebsites] = useState<Website[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedSourceId, setSelectedSourceId] = useState<number | null>(null);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAddSourceModalOpen, setIsAddSourceModalOpen] = useState(false);
@@ -54,6 +57,9 @@ export function MangaDetails() {
 
       if (sourcesRes.status === 'success' && sourcesRes.data) {
         setSources(sourcesRes.data);
+        if (sourcesRes.data.length > 0) {
+          setSelectedSourceId((prev) => prev ?? sourcesRes.data[0].id);
+        }
       }
 
       if (historyRes.status === 'success' && historyRes.data) {
@@ -142,6 +148,18 @@ export function MangaDetails() {
     return null;
   }
 
+  const handleContinueReading = () => {
+    if (history.length === 0 || !selectedSourceId) return;
+
+    const latestChapter = history[0];
+    const source = sources.find((s) => s.id === selectedSourceId);
+    if (!source) return;
+
+    const domain = getWebsiteDomain(source.website_id);
+    const url = `https://${domain}${source.path.replace(/\/$/, '')}/${latestChapter.number}`;
+    window.open(url, '_blank');
+  };
+
   const handleDeleteSource = async (sourceId: number) => {
     if (!api) return;
 
@@ -149,7 +167,11 @@ export function MangaDetails() {
       const response = await api.deleteSource(sourceId);
       if (response.status === 'success') {
         showToast('Source deleted', 'success');
-        setSources((prev) => prev.filter((s) => s.id !== sourceId));
+        const newSources = sources.filter((s) => s.id !== sourceId);
+        setSources(newSources);
+        if (selectedSourceId === sourceId) {
+          setSelectedSourceId(newSources.length > 0 ? newSources[0].id : null);
+        }
       } else {
         showToast(response.message || 'Failed to delete source', 'error');
       }
@@ -170,6 +192,10 @@ export function MangaDetails() {
       day: 'numeric',
     });
   };
+
+  const cleanChapterNumber = (chapterNumber: string) => {
+    return chapterNumber.replace('chapter-', '');
+  }
 
   if (isLoading) {
     return (
@@ -216,14 +242,35 @@ export function MangaDetails() {
             <h1 className="manga-details__title">{manga.name}</h1>
 
             <div className="manga-details__actions">
-              <Button
-                variant="danger"
-                size="sm"
-                onClick={() => setIsDeleteModalOpen(true)}
-              >
-                <Trash2 size={16} />
-                Delete
-              </Button>
+              {history.length > 0 && sources.length > 0 && (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={handleContinueReading}
+                >
+                  <BookOpen size={16} />
+                  Continue Reading
+                  <div className="manga-details__source-selector">
+                    <ChevronUp size={14} />
+                    <select
+                      value={selectedSourceId || ''}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        setSelectedSourceId(Number(e.target.value));
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      className="manga-details__source-select"
+                    >
+                      {sources.map((source) => (
+                        <option key={source.id} value={source.id}>
+                          {getWebsiteDomain(source.website_id)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </Button>
+              )}
             </div>
 
             <section className="manga-details__section">
@@ -298,7 +345,7 @@ export function MangaDetails() {
                   {history.map((chapter) => (
                     <li key={chapter.id} className="manga-details__chapter">
                       <span className="manga-details__chapter-number">
-                        Chapter {chapter.number}
+                        Chapter {cleanChapterNumber(chapter.number)}
                       </span>
                       <span className="manga-details__chapter-date">
                         {formatDate(chapter.updated_at)}
@@ -308,6 +355,17 @@ export function MangaDetails() {
                 </ul>
               )}
             </section>
+
+            <div className="manga-details__danger-zone">
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => setIsDeleteModalOpen(true)}
+              >
+                <Trash2 size={16} />
+                Delete Manga
+              </Button>
+            </div>
           </div>
         </div>
       </main>
