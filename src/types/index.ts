@@ -65,4 +65,5 @@ export interface UpdateMangaPayload {
   cover_small?: string;
   website_domain?: string;
   source_path?: string;
+  chapter_number?: string;
 }
