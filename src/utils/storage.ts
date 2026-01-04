@@ -1,9 +1,11 @@
 import browser from 'webextension-polyfill';
-import { StorageData } from '@/types';
+import { StorageData, Website, Source } from '@/types';
 
 const STORAGE_KEYS = {
   API_URL: 'apiUrl',
   BEARER_TOKEN: 'bearerToken',
+  WEBSITES: 'websites',
+  SOURCES: 'sources',
 } as const;
 
 export async function getStorageData(): Promise<StorageData> {
@@ -40,4 +42,22 @@ export async function clearStorageData(): Promise<void> {
 
 export function isConfigured(data: StorageData): boolean {
   return Boolean(data.apiUrl && data.bearerToken);
+}
+
+export async function getWebsites(): Promise<Website[]> {
+  const result = await browser.storage.local.get(STORAGE_KEYS.WEBSITES);
+  return result[STORAGE_KEYS.WEBSITES] || [];
+}
+
+export async function setWebsites(websites: Website[]): Promise<void> {
+  await browser.storage.local.set({ [STORAGE_KEYS.WEBSITES]: websites });
+}
+
+export async function getSources(): Promise<Source[]> {
+  const result = await browser.storage.local.get(STORAGE_KEYS.SOURCES);
+  return result[STORAGE_KEYS.SOURCES] || [];
+}
+
+export async function setSources(sources: Source[]): Promise<void> {
+  await browser.storage.local.set({ [STORAGE_KEYS.SOURCES]: sources });
 }
