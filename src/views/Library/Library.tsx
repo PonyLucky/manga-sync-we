@@ -5,6 +5,7 @@ import { useApi, useToast } from '@/context';
 import { MangaCard, MangaCardSkeleton, Input, Header, Button } from '@/components';
 import { AddMangaModal } from '@/views/AddManga/AddMangaModal';
 import { Manga } from '@/types';
+import { setWebsites, setSources } from '@/utils/storage';
 import './Library.scss';
 
 export function Library() {
@@ -22,14 +23,27 @@ export function Library() {
 
     setIsLoading(true);
     try {
-      const response = await api.getAllManga();
-      if (response.status === 'success' && response.data) {
-        setManga(response.data);
-      } else {
-        showToast(response.message || 'Failed to fetch manga', 'error');
+      const [mangaRes, websitesRes, sourcesRes] = await Promise.all([
+        api.getAllManga(),
+        api.getAllWebsites(),
+        api.getAllSources(),
+      ]);
+
+      if (mangaRes.status === 'success' && mangaRes.data) {
+        setManga(mangaRes.data);
+      } else if (mangaRes.status === 'error') {
+        showToast(mangaRes.message || 'Failed to fetch manga', 'error');
+      }
+
+      if (websitesRes.status === 'success' && websitesRes.data) {
+        await setWebsites(websitesRes.data);
+      }
+
+      if (sourcesRes.status === 'success' && sourcesRes.data) {
+        await setSources(sourcesRes.data);
       }
     } catch {
-      showToast('Failed to fetch manga', 'error');
+      showToast('Failed to fetch library data', 'error');
     } finally {
       setIsLoading(false);
     }
