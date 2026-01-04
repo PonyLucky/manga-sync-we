@@ -27,11 +27,50 @@
     }
   }
 
+  &__title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-md;
+
+    @media (min-width: $breakpoint-md) {
+      justify-content: flex-start;
+    }
+  }
+
   &__title {
     font-size: 2rem;
     font-weight: 700;
     color: $color-text-primary;
     @include gradient-text;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  &__add-btn {
+    & > span {
+      width: max-content;
+    }
+
+    &--mobile {
+      display: flex;
+
+      @media (min-width: $breakpoint-md) {
+        display: none;
+      }
+    }
+
+    &--desktop {
+      display: none;
+
+      @media (min-width: $breakpoint-md) {
+        display: flex;
+      }
+    }
   }
 
   &__search {

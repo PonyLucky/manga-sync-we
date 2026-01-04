@@ -1,13 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Library, Settings, Plus } from 'lucide-react';
-import { Button } from '../Button/Button';
+import { Library, Settings } from 'lucide-react';
 import './Header.scss';
 
-interface HeaderProps {
-  onAddManga?: () => void;
-}
-
-export function Header({ onAddManga }: HeaderProps) {
+export function Header() {
   const location = useLocation();
 
   return (
@@ -33,15 +28,6 @@ export function Header({ onAddManga }: HeaderProps) {
             <span>Settings</span>
           </Link>
         </nav>
-
-        <div className="header__actions">
-          {onAddManga && (
-            <Button variant="primary" size="sm" onClick={onAddManga}>
-              <Plus size={18} />
-              <span>Add Manga</span>
-            </Button>
-          )}
-        </div>
       </div>
     </header>
   );

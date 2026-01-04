@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, AlertCircle } from 'lucide-react';
+import { Search, AlertCircle, Plus } from 'lucide-react';
 import { useApi, useToast } from '@/context';
-import { MangaCard, MangaCardSkeleton, Input, Header } from '@/components';
+import { MangaCard, MangaCardSkeleton, Input, Header, Button } from '@/components';
 import { AddMangaModal } from '@/views/AddManga/AddMangaModal';
 import { Manga } from '@/types';
 import './Library.scss';
@@ -86,18 +86,38 @@ export function Library() {
 
   return (
     <div className="library">
-      <Header onAddManga={() => setIsAddModalOpen(true)} />
+      <Header />
 
       <main className="library__content">
         <div className="library__header">
-          <h1 className="library__title">My Library</h1>
-          <div className="library__search">
-            <Input
-              placeholder="Search manga..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              icon={<Search size={18} />}
-            />
+          <div className="library__title-row">
+            <h1 className="library__title">My Library</h1>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsAddModalOpen(true)}
+              className="library__add-btn library__add-btn--mobile"
+            >
+              <Plus size={18} />
+            </Button>
+          </div>
+          <div className="library__actions">
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsAddModalOpen(true)}
+              className="library__add-btn library__add-btn--desktop"
+            >
+              <Plus size={18} /> Add Manga
+            </Button>
+            <div className="library__search">
+              <Input
+                placeholder="Search manga..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                icon={<Search size={18} />}
+              />
+            </div>
           </div>
         </div>
 
