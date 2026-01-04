@@ -48,7 +48,9 @@ browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${bearerToken}`
               },
-              body: JSON.stringify({ chapter })
+              body: JSON.stringify({
+                chapter_number: chapter
+              })
             });
           }
           break;
