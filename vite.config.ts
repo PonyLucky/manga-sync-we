@@ -10,6 +10,13 @@ export default defineConfig({
     },
   },
   publicDir: 'public',
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern-compiler',
+      },
+    },
+  },
   build: {
     outDir: 'dist',
     rollupOptions: {

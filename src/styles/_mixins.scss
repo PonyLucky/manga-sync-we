@@ -1,3 +1,4 @@
+@use 'sass:list';
 @use 'variables' as *;
 
 // Gradient text
@@ -64,12 +65,12 @@
 
 // Smooth transition
 @mixin smooth-transition($properties...) {
-  @if length($properties) == 0 {
+  @if list.length($properties) == 0 {
     transition: all $transition-normal;
   } @else {
     $transition-list: ();
     @each $property in $properties {
-      $transition-list: append($transition-list, $property $transition-normal, comma);
+      $transition-list: list.append($transition-list, $property $transition-normal, comma);
     }
     transition: $transition-list;
   }
