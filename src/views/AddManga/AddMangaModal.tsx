@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal, Input, Button } from '@/components';
 import { useApi, useToast } from '@/context';
+import type { Website } from '@/types';
 import './AddMangaModal.scss';
 
 interface AddMangaModalProps {
@@ -38,11 +39,24 @@ export function AddMangaModal({ isOpen, onClose, onSuccess }: AddMangaModalProps
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [websites, setWebsites] = useState<Website[]>([]);
 
-  const handleChange = (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, [field]: e.target.value }));
-    setErrors((prev) => ({ ...prev, [field]: undefined }));
-  };
+  useEffect(() => {
+    if (isOpen && api) {
+      api.getAllWebsites().then((response) => {
+        if (response.status === 'success' && response.data) {
+          setWebsites(response.data);
+        }
+      });
+    }
+  }, [isOpen, api]);
+
+  const handleChange =
+    (field: keyof FormData) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    };
 
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
@@ -169,14 +183,24 @@ export function AddMangaModal({ isOpen, onClose, onSuccess }: AddMangaModalProps
           <span>Initial Source (Optional)</span>
         </div>
 
-        <Input
-          label="Domain"
-          placeholder="mangasite.com"
-          value={formData.domain}
-          onChange={handleChange('domain')}
-          error={errors.domain}
-          fullWidth
-        />
+        <div className="input-wrapper input-wrapper--full-width">
+          <label className="input-wrapper__label">Domain</label>
+          <div className={`input-container ${errors.domain ? 'input-container--error' : ''}`}>
+            <select
+              className="input"
+              value={formData.domain}
+              onChange={handleChange('domain')}
+            >
+              <option value="">Select a website</option>
+              {websites.map((website) => (
+                <option key={website.id} value={website.domain}>
+                  {website.domain}
+                </option>
+              ))}
+            </select>
+          </div>
+          {errors.domain && <span className="input-wrapper__error">{errors.domain}</span>}
+        </div>
 
         <Input
           label="Path"
