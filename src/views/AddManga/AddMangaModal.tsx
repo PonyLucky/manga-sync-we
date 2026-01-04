@@ -86,6 +86,8 @@ export function AddMangaModal({ isOpen, onClose, onSuccess }: AddMangaModalProps
         name: formData.name,
         cover: formData.cover,
         cover_small: formData.coverSmall,
+        website_domain: formData.domain.trim() || undefined,
+        source_path: formData.path.trim() || undefined,
       });
 
       if (mangaResponse.status !== 'success' || !mangaResponse.data) {

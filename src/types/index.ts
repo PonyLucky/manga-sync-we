@@ -49,6 +49,8 @@ export interface CreateMangaPayload {
   name: string;
   cover: string;
   cover_small: string;
+  website_domain?: string;
+  source_path?: string;
 }
 
 export interface CreateSourcePayload {
@@ -61,4 +63,6 @@ export interface UpdateMangaPayload {
   name?: string;
   cover?: string;
   cover_small?: string;
+  website_domain?: string;
+  source_path?: string;
 }
