@@ -16,7 +16,7 @@ import './MangaDetails.scss';
 export function MangaDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { api } = useApi();
+  const { api, isConfigured, isLoading: isApiLoading } = useApi();
   const { showToast } = useToast();
 
   const [manga, setManga] = useState<MangaDetailsType | null>(null);
@@ -71,8 +71,15 @@ export function MangaDetails() {
   };
 
   useEffect(() => {
+    if (isApiLoading) return;
+
+    if (!isConfigured) {
+      navigate('/settings');
+      return;
+    }
+
     fetchMangaData();
-  }, [api, id]);
+  }, [api, id, isConfigured, isApiLoading, navigate]);
 
   const handleDelete = async () => {
     if (!api || !id) return;
@@ -119,6 +126,21 @@ export function MangaDetails() {
       setIsAddingSource(false);
     }
   };
+
+  if (isApiLoading) {
+    return (
+      <div className="manga-details">
+        <Header />
+        <main className="manga-details__content">
+          <Skeleton height={400} />
+        </main>
+      </div>
+    );
+  }
+
+  if (!isConfigured) {
+    return null;
+  }
 
   const handleDeleteSource = async (sourceId: number) => {
     if (!api) return;

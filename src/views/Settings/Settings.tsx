@@ -6,7 +6,7 @@ import { Website, Setting } from '@/types';
 import './Settings.scss';
 
 export function Settings() {
-  const { api, config, updateConfig, isConfigured } = useApi();
+  const { api, config, updateConfig, isConfigured, isLoading: isApiLoading } = useApi();
   const { showToast } = useToast();
 
   const [apiUrl, setApiUrl] = useState(config.apiUrl);
@@ -22,16 +22,18 @@ export function Settings() {
   const [isLoadingSettings, setIsLoadingSettings] = useState(false);
 
   useEffect(() => {
-    setApiUrl(config.apiUrl);
-    setBearerToken(config.bearerToken);
-  }, [config]);
+    if (!isApiLoading) {
+      setApiUrl(config.apiUrl);
+      setBearerToken(config.bearerToken);
+    }
+  }, [config, isApiLoading]);
 
   useEffect(() => {
-    if (isConfigured && api) {
+    if (isConfigured && api && !isApiLoading) {
       fetchWebsites();
       fetchSettings();
     }
-  }, [isConfigured, api]);
+  }, [isConfigured, api, isApiLoading]);
 
   const fetchWebsites = async () => {
     if (!api) return;
@@ -105,6 +107,18 @@ export function Settings() {
       setIsAddingDomain(false);
     }
   };
+
+  if (isApiLoading) {
+    return (
+      <div className="settings">
+        <Header />
+        <main className="settings__content">
+          <h1 className="settings__title">Settings</h1>
+          <div className="settings__loading">Loading configuration...</div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="settings">

@@ -9,7 +9,7 @@ import './Library.scss';
 
 export function Library() {
   const navigate = useNavigate();
-  const { api, isConfigured } = useApi();
+  const { api, isConfigured, isLoading: isApiLoading } = useApi();
   const { showToast } = useToast();
 
   const [manga, setManga] = useState<Manga[]>([]);
@@ -36,13 +36,15 @@ export function Library() {
   };
 
   useEffect(() => {
+    if (isApiLoading) return;
+
     if (!isConfigured) {
       navigate('/settings');
       return;
     }
 
     fetchManga();
-  }, [api, isConfigured, navigate]);
+  }, [api, isConfigured, isApiLoading, navigate]);
 
   const filteredManga = useMemo(() => {
     if (!searchQuery.trim()) return manga;
@@ -59,6 +61,24 @@ export function Library() {
     setIsAddModalOpen(false);
     fetchManga();
   };
+
+  if (isApiLoading) {
+    return (
+      <div className="library">
+        <Header />
+        <main className="library__content">
+          <div className="library__header">
+            <h1 className="library__title">My Library</h1>
+          </div>
+          <div className="library__grid">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <MangaCardSkeleton key={i} />
+            ))}
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   if (!isConfigured) {
     return null;
