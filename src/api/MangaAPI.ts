@@ -6,7 +6,6 @@ import {
   Website,
   Source,
   Chapter,
-  Setting,
   CreateMangaPayload,
   CreateSourcePayload,
   UpdateMangaPayload,
@@ -80,6 +79,10 @@ export class MangaAPI {
   // Source endpoints
   async getMangaSources(mangaId: number): Promise<ApiResponse<Source[]>> {
     return this.request<Source[]>('get', `/manga/${mangaId}/source`);
+  }
+
+  async getAllSources(): Promise<ApiResponse<Source[]>> {
+    return this.request<Source[]>('get', '/source');
   }
 
   async createSource(payload: CreateSourcePayload): Promise<ApiResponse<Source>> {
