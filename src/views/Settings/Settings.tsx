@@ -97,7 +97,7 @@ export function Settings() {
     setIsAddingDomain(true);
     try {
       const response = await api.createWebsite(newDomain);
-      if (response.status === 'success' && response.data) {
+      if (response.status === 'success') {
         setNewDomain('');
         showToast('Website added successfully', 'success');
         fetchWebsites();
