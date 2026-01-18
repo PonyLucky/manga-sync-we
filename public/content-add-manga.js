@@ -127,13 +127,14 @@
       });
 
       if (!response.success) {
-        throw new Error(response.error || 'Failed to create manga');
+        messageEl.textContent = response.error || 'Failed to create manga';
+        messageEl.className = 'manga-sync-form__message manga-sync-form__message--error';
+      } else {
+        messageEl.textContent = 'Manga added successfully!';
+        messageEl.className = 'manga-sync-form__message manga-sync-form__message--success';
+
+        setTimeout(hideForm, 1500);
       }
-
-      messageEl.textContent = 'Manga added successfully!';
-      messageEl.className = 'manga-sync-form__message manga-sync-form__message--success';
-
-      setTimeout(hideForm, 1500);
     } catch (error) {
       messageEl.textContent = error.message || 'An error occurred';
       messageEl.className = 'manga-sync-form__message manga-sync-form__message--error';
