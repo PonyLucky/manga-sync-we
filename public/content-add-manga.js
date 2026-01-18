@@ -29,29 +29,29 @@
           <h2>Add Manga to Manga Sync</h2>
           <button type="button" class="manga-sync-form__close" id="manga-sync-close">&times;</button>
         </div>
-        <form id="manga-sync-add-form">
+        <form id="manga-sync-add-form" autocomplete="off">
           <div class="manga-sync-form__group">
             <label for="manga-sync-name">Manga Name *</label>
-            <input type="text" id="manga-sync-name" placeholder="Enter manga name" required />
+            <input type="text" id="manga-sync-name" placeholder="Enter manga name" required autocomplete="off" />
           </div>
           <div class="manga-sync-form__group">
             <label for="manga-sync-cover">Cover URL *</label>
-            <input type="text" id="manga-sync-cover" placeholder="https://example.com/cover.jpg" required />
+            <input type="text" id="manga-sync-cover" placeholder="https://example.com/cover.jpg" required autocomplete="off" />
           </div>
           <div class="manga-sync-form__group">
             <label for="manga-sync-cover-small">Small Cover URL *</label>
-            <input type="text" id="manga-sync-cover-small" placeholder="https://example.com/cover-small.jpg" required />
+            <input type="text" id="manga-sync-cover-small" placeholder="https://example.com/cover-small.jpg" required autocomplete="off" />
           </div>
           <div class="manga-sync-form__divider">Initial Source (Optional)</div>
           <div class="manga-sync-form__group">
             <label for="manga-sync-domain">Domain</label>
-            <select id="manga-sync-domain">
+            <select id="manga-sync-domain" autocomplete="off">
               <option value="">Select a website</option>
             </select>
           </div>
           <div class="manga-sync-form__group">
             <label for="manga-sync-path">Path</label>
-            <input type="text" id="manga-sync-path" placeholder="/manga/example-manga" />
+            <input type="text" id="manga-sync-path" placeholder="/manga/example-manga" autocomplete="off" />
           </div>
           <div class="manga-sync-form__actions">
             <button type="button" class="manga-sync-btn manga-sync-btn--ghost" id="manga-sync-cancel">Cancel</button>
@@ -114,57 +114,20 @@
     submitBtn.textContent = 'Adding...';
 
     try {
-      // Get website ID if domain is selected
-      let websiteId = null;
-      if (domain) {
-        const website = formData.websites.find((w) => w.domain === domain);
-        if (website) {
-          websiteId = website.id;
-        }
-      }
-
-      // Create manga
-      const mangaResponse = await fetch(`${formData.apiUrl}/manga`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${formData.bearerToken}`,
-        },
-        body: JSON.stringify({
+      // Send message to background script to create manga
+      const response = await browser.runtime.sendMessage({
+        type: 'MANGA_SYNC_CREATE_MANGA',
+        data: {
           name,
           cover,
-          cover_small: coverSmall,
-          website_domain: domain || undefined,
-          source_path: path || undefined,
-        }),
+          coverSmall,
+          domain,
+          path,
+        },
       });
 
-      if (!mangaResponse.ok) {
-        throw new Error('Failed to create manga');
-      }
-
-      const manga = await mangaResponse.json();
-
-      // Create source if domain and path are provided
-      if (websiteId && path) {
-        const sourceResponse = await fetch(`${formData.apiUrl}/sources`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${formData.bearerToken}`,
-          },
-          body: JSON.stringify({
-            manga_id: manga.id,
-            website_id: websiteId,
-            path,
-          }),
-        });
-
-        if (!sourceResponse.ok) {
-          messageEl.textContent = 'Manga created but failed to add source';
-          messageEl.className = 'manga-sync-form__message manga-sync-form__message--error';
-          return;
-        }
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to create manga');
       }
 
       messageEl.textContent = 'Manga added successfully!';

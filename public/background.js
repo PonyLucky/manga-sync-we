@@ -131,20 +131,75 @@ async function handleAddManga(tabId, domain, path) {
     });
 
     // Send data to the content script
-    const storage = await browser.storage.local.get(['apiUrl', 'bearerToken', 'websites']);
+    const storage = await browser.storage.local.get(['websites']);
 
     await browser.tabs.sendMessage(tabId, {
       type: 'MANGA_SYNC_SHOW_FORM',
       data: {
         domain,
         path,
-        apiUrl: storage.apiUrl,
-        bearerToken: storage.bearerToken,
         websites: storage.websites || [],
       },
     });
   } catch (error) {
     console.error('Manga Sync: Failed to inject form', error);
+  }
+}
+
+// Handle messages from content script
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'MANGA_SYNC_CREATE_MANGA') {
+    handleCreateManga(message.data).then(sendResponse);
+    return true; // Keep the message channel open for async response
+  }
+});
+
+async function handleCreateManga({ name, cover, coverSmall, domain, path }) {
+  try {
+    const storage = await browser.storage.local.get(['apiUrl', 'bearerToken']);
+    const { apiUrl, bearerToken } = storage;
+
+    if (!apiUrl || !bearerToken) {
+      return { success: false, error: 'API not configured' };
+    }
+
+    // Create manga (backend handles source creation when domain and path are provided)
+    const mangaResponse = await fetch(`${apiUrl}/manga`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${bearerToken}`,
+      },
+      body: JSON.stringify({
+        name,
+        cover,
+        cover_small: coverSmall,
+        website_domain: domain || undefined,
+        source_path: path || undefined,
+      }),
+    });
+
+    if (!mangaResponse.ok) {
+      return { success: false, error: 'Failed to create manga' };
+    }
+
+    const manga = await mangaResponse.json();
+
+    // Refresh sources in local storage
+    if (domain && path) {
+      const sourcesResponse = await fetch(`${apiUrl}/source`, {
+        headers: { Authorization: `Bearer ${bearerToken}` },
+      });
+      if (sourcesResponse.ok) {
+        const sources = await sourcesResponse.json();
+        await browser.storage.local.set({ sources });
+      }
+    }
+
+    return { success: true, manga };
+  } catch (error) {
+    console.error('Manga Sync: Failed to create manga', error);
+    return { success: false, error: error.message || 'An error occurred' };
   }
 }
 
