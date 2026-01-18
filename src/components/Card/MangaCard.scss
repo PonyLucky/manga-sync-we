@@ -28,6 +28,25 @@
     background: $color-bg-secondary;
   }
 
+  &__unread-badge {
+    position: absolute;
+    top: $spacing-sm;
+    right: $spacing-sm;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 $spacing-xs;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $color-accent-primary;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: $radius-full;
+    box-shadow: $shadow-md;
+    z-index: 1;
+  }
+
   &__skeleton {
     position: absolute;
     inset: 0;

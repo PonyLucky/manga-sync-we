@@ -58,6 +58,7 @@ export function MangaDetails() {
       if (sourcesRes.status === 'success' && sourcesRes.data) {
         setSources(sourcesRes.data);
         if (sourcesRes.data.length > 0) {
+          // @ts-ignore
           setSelectedSourceId((prev) => prev ?? sourcesRes.data[0].id);
         }
       }
@@ -236,6 +237,11 @@ export function MangaDetails() {
               alt={manga.name}
               className="manga-details__cover"
             />
+            {manga.number_unread_chapter != null && manga.number_unread_chapter > 0 && (
+              <div className="manga-details__unread-badge">
+                {manga.number_unread_chapter > 99 ? '99+' : manga.number_unread_chapter} unread
+              </div>
+            )}
           </div>
 
           <div className="manga-details__info">
@@ -296,9 +302,16 @@ export function MangaDetails() {
                   {sources.map((source) => (
                     <li key={source.id} className="manga-details__source">
                       <div className="manga-details__source-info">
-                        <span className="manga-details__source-domain">
-                          {getWebsiteDomain(source.website_id)}
-                        </span>
+                        <div className="manga-details__source-header">
+                          <span className="manga-details__source-domain">
+                            {getWebsiteDomain(source.website_id)}
+                          </span>
+                          {source.number_unread_chapter != null && source.number_unread_chapter > 0 && (
+                            <span className="manga-details__source-unread">
+                              {source.number_unread_chapter} unread
+                            </span>
+                          )}
+                        </div>
                         <span className="manga-details__source-path">
                           {source.path}
                         </span>

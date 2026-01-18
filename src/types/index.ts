@@ -9,6 +9,7 @@ export interface Manga {
   name: string;
   cover: string;
   cover_small: string;
+  number_unread_chapter: number | null;
 }
 
 export interface MangaDetails extends Manga {
@@ -26,6 +27,7 @@ export interface Source {
   manga_id: number;
   website_id: number;
   path: string;
+  number_unread_chapter: number | null;
 }
 
 export interface Chapter {
