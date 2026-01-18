@@ -2,6 +2,10 @@
 
 A Firefox Web Extension for managing and syncing your manga reading progress.
 
+## Showcase
+
+
+
 ## Features
 
 - **Library Management**: View all your manga in a responsive grid layout
@@ -55,30 +59,16 @@ On first launch, you'll need to configure the extension:
 1. Click the extension icon to open Manga Sync
 2. You'll be redirected to Settings
 3. Enter your API URL (e.g., `http://localhost:7783`)
-4. Enter your Bearer Token
+4. Enter your Bearer Token (the API will generate one for you).
 5. Click "Save Configuration"
 
 ## API Requirements
 
-This extension requires a compatible Manga Manager API backend. The API should support:
+This extension requires a compatible Manga Manager API backend, which can be found [here](https://github.com/PonyLucky/manga-sync).
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/manga` | GET | List all manga |
-| `/manga/:id` | GET | Get manga details |
-| `/manga` | POST | Create new manga |
-| `/manga/:id` | PATCH | Update manga |
-| `/manga/:id` | DELETE | Delete manga |
-| `/manga/:id/source` | GET | Get manga sources |
-| `/manga/:id/history` | GET | Get reading history |
-| `/source` | POST | Add source |
-| `/source/:id` | DELETE | Delete source |
-| `/website` | GET | List websites |
-| `/website/:domain` | GET | Get website by domain |
-| `/website/:domain` | POST | Add website |
-| `/setting` | GET | Get server settings |
+## Refresh the Bearer Token
 
-All endpoints require `Authorization: Bearer <token>` header.
+If using the default API backend, the token is shown only the first time in the logs in the API. To refresh it, you can delete the file `key.pub`.
 
 ## Tech Stack
 

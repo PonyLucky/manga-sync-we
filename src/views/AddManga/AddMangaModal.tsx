@@ -112,8 +112,7 @@ export function AddMangaModal({ isOpen, onClose, onSuccess }: AddMangaModalProps
 
       // Create source if domain was provided
       if (websiteId && formData.path.trim()) {
-        const sourceResponse = await api.createSource({
-          manga_id: mangaResponse.data.id,
+        const sourceResponse = await api.createSource(mangaResponse.data.id, {
           website_id: websiteId,
           path: formData.path,
         });

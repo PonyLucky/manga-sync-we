@@ -90,12 +90,12 @@ export class MangaAPI {
     return this.request<Source[]>('get', '/source');
   }
 
-  async createSource(payload: CreateSourcePayload): Promise<ApiResponse<Source>> {
-    return this.request<Source>('post', '/source', payload);
+  async createSource(mangaId: number, payload: Omit<CreateSourcePayload, 'manga_id'>): Promise<ApiResponse<Source>> {
+    return this.request<Source>('post', `/manga/${mangaId}/source`, payload);
   }
 
-  async deleteSource(id: number): Promise<ApiResponse<null>> {
-    return this.request<null>('delete', `/source/${id}`);
+  async deleteSource(mangaId: number, domain: string): Promise<ApiResponse<null>> {
+    return this.request<null>('delete', `/manga/${mangaId}/source/${encodeURIComponent(domain)}`);
   }
 
   // History endpoints

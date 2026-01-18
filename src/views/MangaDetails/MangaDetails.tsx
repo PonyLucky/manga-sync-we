@@ -113,8 +113,7 @@ export function MangaDetails() {
 
     setIsAddingSource(true);
     try {
-      const response = await api.createSource({
-        manga_id: Number(id),
+      const response = await api.createSource(Number(id), {
         website_id: Number(newSource.websiteId),
         path: newSource.path,
       });
@@ -161,16 +160,17 @@ export function MangaDetails() {
     window.open(url, '_blank');
   };
 
-  const handleDeleteSource = async (sourceId: number) => {
-    if (!api) return;
+  const handleDeleteSource = async (source: Source) => {
+    if (!api || !id) return;
 
+    const domain = getWebsiteDomain(source.website_id);
     try {
-      const response = await api.deleteSource(sourceId);
+      const response = await api.deleteSource(Number(id), domain);
       if (response.status === 'success') {
         showToast('Source deleted', 'success');
-        const newSources = sources.filter((s) => s.id !== sourceId);
+        const newSources = sources.filter((s) => s.id !== source.id);
         setSources(newSources);
-        if (selectedSourceId === sourceId) {
+        if (selectedSourceId === source.id) {
           setSelectedSourceId(newSources.length > 0 ? newSources[0].id : null);
         }
       } else {
@@ -332,7 +332,7 @@ export function MangaDetails() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDeleteSource(source.id)}
+                          onClick={() => handleDeleteSource(source)}
                         >
                           <Trash2 size={16} />
                         </Button>
