@@ -126,13 +126,11 @@ async function handleAddWebsite(domain) {
     }
 
     // Create website via API
-    const response = await fetch(`${apiUrl}/websites`, {
+    const response = await fetch(`${apiUrl}/website/${domain}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${bearerToken}`,
       },
-      body: JSON.stringify({ domain }),
     });
 
     if (response.ok) {
