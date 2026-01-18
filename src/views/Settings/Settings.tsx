@@ -15,7 +15,7 @@ export function Settings() {
 
   const [websites, setWebsites] = useState<Website[]>([]);
   const [isLoadingWebsites, setIsLoadingWebsites] = useState(false);
-  const [deletingWebsiteId, setDeletingWebsiteId] = useState<number | null>(null);
+  const [deletingWebsiteDomain, setDeletingWebsiteDomain] = useState<string | null>(null);
   const [newDomain, setNewDomain] = useState('');
   const [isAddingDomain, setIsAddingDomain] = useState(false);
 
@@ -110,14 +110,14 @@ export function Settings() {
     }
   };
 
-  const handleDeleteWebsite = async (id: number) => {
+  const handleDeleteWebsite = async (domain: string) => {
     if (!api) return;
 
-    setDeletingWebsiteId(id);
+    setDeletingWebsiteDomain(domain);
     try {
-      const response = await api.deleteWebsite(id);
+      const response = await api.deleteWebsite(domain);
       if (response.status === 'success') {
-        setWebsites((prev) => prev.filter((w) => w.id !== id));
+        setWebsites((prev) => prev.filter((w) => w.domain !== domain));
         showToast('Website deleted successfully', 'success');
       } else {
         showToast(response.message || 'Failed to delete website', 'error');
@@ -125,7 +125,7 @@ export function Settings() {
     } catch {
       showToast('Failed to delete website', 'error');
     } finally {
-      setDeletingWebsiteId(null);
+      setDeletingWebsiteDomain(null);
     }
   };
 
@@ -241,8 +241,8 @@ export function Settings() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDeleteWebsite(website.id)}
-                        loading={deletingWebsiteId === website.id}
+                        onClick={() => handleDeleteWebsite(website.domain)}
+                        loading={deletingWebsiteDomain === website.domain}
                       >
                         <Trash2 size={16} />
                       </Button>

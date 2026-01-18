@@ -116,8 +116,8 @@ export class MangaAPI {
     return this.request<Website[]>('get', '/website');
   }
 
-  async deleteWebsite(id: number): Promise<ApiResponse<null>> {
-    return this.request<null>('delete', `/website/${id}`);
+  async deleteWebsite(domain: string): Promise<ApiResponse<null>> {
+    return this.request<null>('delete', `/website/${encodeURIComponent(domain)}`);
   }
 
   // Settings endpoints
