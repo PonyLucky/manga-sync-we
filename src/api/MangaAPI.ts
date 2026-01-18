@@ -9,6 +9,7 @@ import {
   CreateMangaPayload,
   CreateSourcePayload,
   UpdateMangaPayload,
+  RefreshUnreadData,
 } from '@/types';
 
 export class MangaAPI {
@@ -74,6 +75,10 @@ export class MangaAPI {
 
   async deleteManga(id: number): Promise<ApiResponse<null>> {
     return this.request<null>('delete', `/manga/${id}`);
+  }
+
+  async refreshAllUnread(): Promise<ApiResponse<RefreshUnreadData>> {
+    return this.request<RefreshUnreadData>('post', '/manga/refresh-unread');
   }
 
   // Source endpoints

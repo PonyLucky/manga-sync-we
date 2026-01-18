@@ -41,7 +41,7 @@ browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
           }
 
           if (chapter) {
-            // 4. PATCH /manga/{id} with the chapter in the body
+            // 4. PATCH /manga/{id} with the chapter and website_domain in the body
             await fetch(`${apiUrl}/manga/${source.manga_id}`, {
               method: 'PATCH',
               headers: {
@@ -49,7 +49,8 @@ browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
                 'Authorization': `Bearer ${bearerToken}`
               },
               body: JSON.stringify({
-                chapter_number: chapter
+                chapter_number: chapter,
+                website_domain: matchingWebsite.domain
               })
             });
           }

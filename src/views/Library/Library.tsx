@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, AlertCircle, Plus } from 'lucide-react';
+import { Search, AlertCircle, Plus, RefreshCw } from 'lucide-react';
 import { useApi, useToast } from '@/context';
 import { MangaCard, MangaCardSkeleton, Input, Header, Button } from '@/components';
 import { AddMangaModal } from '@/views/AddManga/AddMangaModal';
@@ -17,6 +17,7 @@ export function Library() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const fetchManga = async () => {
     if (!api) return;
@@ -76,6 +77,30 @@ export function Library() {
     fetchManga();
   };
 
+  const handleRefresh = async () => {
+    if (!api || isRefreshing) return;
+
+    setIsRefreshing(true);
+    try {
+      const res = await api.refreshAllUnread();
+      if (res.status === 'success' && res.data) {
+        const { success, errors } = res.data;
+        if (errors > 0) {
+          showToast(`Refreshed ${success} manga, ${errors} failed`, 'warning');
+        } else {
+          showToast(`Refreshed ${success} manga`, 'success');
+        }
+        fetchManga();
+      } else if (res.status === 'error') {
+        showToast(res.message || 'Failed to refresh unread counts', 'error');
+      }
+    } catch {
+      showToast('Failed to refresh unread counts', 'error');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   if (isApiLoading) {
     return (
       <div className="library">
@@ -106,16 +131,36 @@ export function Library() {
         <div className="library__header">
           <div className="library__title-row">
             <h1 className="library__title">My Library</h1>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setIsAddModalOpen(true)}
-              className="library__add-btn library__add-btn--mobile"
-            >
-              <Plus size={18} />
-            </Button>
+            <div className="library__mobile-actions">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className="library__refresh-btn library__refresh-btn--mobile"
+              >
+                <RefreshCw size={18} className={isRefreshing ? 'spinning' : ''} />
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setIsAddModalOpen(true)}
+                className="library__add-btn library__add-btn--mobile"
+              >
+                <Plus size={18} />
+              </Button>
+            </div>
           </div>
           <div className="library__actions">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="library__refresh-btn library__refresh-btn--desktop"
+            >
+              <RefreshCw size={18} className={isRefreshing ? 'spinning' : ''} /> Refresh
+            </Button>
             <Button
               variant="primary"
               size="sm"

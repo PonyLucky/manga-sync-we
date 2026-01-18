@@ -69,3 +69,18 @@ export interface UpdateMangaPayload {
   source_path?: string;
   chapter_number?: string;
 }
+
+export interface RefreshUnreadResult {
+  manga_id: number;
+  manga_name: string;
+  domain: string;
+  unread_count: number | null;
+  error: string | null;
+}
+
+export interface RefreshUnreadData {
+  total: number;
+  success: number;
+  errors: number;
+  results: RefreshUnreadResult[];
+}

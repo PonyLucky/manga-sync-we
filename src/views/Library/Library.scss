@@ -38,6 +38,16 @@
     }
   }
 
+  &__mobile-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    @media (min-width: $breakpoint-md) {
+      display: none;
+    }
+  }
+
   &__title {
     font-size: 2rem;
     font-weight: 700;
@@ -59,6 +69,30 @@
     &--mobile {
       display: flex;
 
+      @media (min-width: $breakpoint-md) {
+        display: none;
+      }
+    }
+
+    &--desktop {
+      display: none;
+
+      @media (min-width: $breakpoint-md) {
+        display: flex;
+      }
+    }
+  }
+
+  &__refresh-btn {
+    & > span {
+      width: max-content;
+    }
+
+    .spinning {
+      animation: spin 1s linear infinite;
+    }
+
+    &--mobile {
       @media (min-width: $breakpoint-md) {
         display: none;
       }
