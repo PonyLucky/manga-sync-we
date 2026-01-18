@@ -116,4 +116,5 @@ src/
 
 ## License
 
-GNU AGPLv3
+This project is licensed under the GNU AGPLv3 - see the [LICENSE](LICENSE) file for details.
+
