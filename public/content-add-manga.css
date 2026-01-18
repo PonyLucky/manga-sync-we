@@ -1,0 +1,185 @@
+#manga-sync-form-container {
+  width: 100%;
+  background: #1a1a2e;
+  padding: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  box-sizing: border-box;
+  border-bottom: 2px solid #6366f1;
+}
+
+#manga-sync-form-container * {
+  box-sizing: border-box;
+}
+
+.manga-sync-form {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 8px 0;
+  color: #e0e0e0;
+}
+
+.manga-sync-form__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.manga-sync-form__header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.manga-sync-form__close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #888;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.manga-sync-form__close:hover {
+  color: #fff;
+}
+
+.manga-sync-form__group {
+  margin-bottom: 16px;
+}
+
+.manga-sync-form__group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #b0b0b0;
+}
+
+.manga-sync-form__group input,
+.manga-sync-form__group select {
+  width: 100%;
+  padding: 10px 12px;
+  background: #16162a;
+  border: 1px solid #2a2a4a;
+  border-radius: 8px;
+  color: #e0e0e0;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.manga-sync-form__group input:focus,
+.manga-sync-form__group select:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.manga-sync-form__group input::placeholder {
+  color: #666;
+}
+
+.manga-sync-form__group select {
+  cursor: pointer;
+}
+
+.manga-sync-form__group select option {
+  background: #16162a;
+  color: #e0e0e0;
+}
+
+.manga-sync-form__divider {
+  text-align: center;
+  margin: 20px 0;
+  font-size: 12px;
+  color: #888;
+  position: relative;
+}
+
+.manga-sync-form__divider::before,
+.manga-sync-form__divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: calc(50% - 80px);
+  height: 1px;
+  background: #2a2a4a;
+}
+
+.manga-sync-form__divider::before {
+  left: 0;
+}
+
+.manga-sync-form__divider::after {
+  right: 0;
+}
+
+.manga-sync-form__actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.manga-sync-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.manga-sync-btn--ghost {
+  background: transparent;
+  color: #b0b0b0;
+  border: 1px solid #2a2a4a;
+}
+
+.manga-sync-btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.manga-sync-btn--primary {
+  background: #6366f1;
+  color: #fff;
+}
+
+.manga-sync-btn--primary:hover {
+  background: #5558e3;
+}
+
+.manga-sync-btn--primary:disabled {
+  background: #4a4a6a;
+  cursor: not-allowed;
+}
+
+.manga-sync-form__message {
+  margin-top: 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  text-align: center;
+  display: none;
+}
+
+.manga-sync-form__message--error {
+  display: block;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.manga-sync-form__message--success {
+  display: block;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}

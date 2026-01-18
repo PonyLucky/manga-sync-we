@@ -7,7 +7,10 @@
     "48": "icons/icon-48.svg"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "contextMenus",
+    "scripting",
+    "activeTab"
   ],
   "host_permissions": [
     "<all_urls>"
@@ -27,5 +30,11 @@
       "id": "manga-sync@example.com",
       "strict_min_version": "109.0"
     }
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["content-add-manga.js", "content-add-manga.css"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
