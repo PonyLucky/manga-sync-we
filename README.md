@@ -116,4 +116,4 @@ src/
 
 ## License
 
-MIT
+GNU AGPLv3
