@@ -138,6 +138,24 @@ async function handleAddWebsite(domain) {
       // Update local storage
       websites.push(data);
       await browser.storage.local.set({ websites });
+      
+      // Also refresh the whole list to be sure and consistent with other actions
+      try {
+        const fullResponse = await fetch(`${apiUrl}/website`, {
+          headers: {
+            'Authorization': `Bearer ${bearerToken}`,
+          },
+        });
+        if (fullResponse.ok) {
+          const fullData = await fullResponse.json();
+          if (fullData.status === 'success' && fullData.data) {
+            await browser.storage.local.set({ websites: fullData.data });
+          }
+        }
+      } catch (e) {
+        console.error('Manga Sync: Failed to refresh websites list', e);
+      }
+
       await updateContextMenus();
     }
   } catch (error) {

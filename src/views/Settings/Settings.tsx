@@ -3,6 +3,7 @@ import { Save, Plus, Trash2, Globe, Key, Server, RefreshCw } from 'lucide-react'
 import { useApi, useToast } from '@/context';
 import { Header, Button, Input } from '@/components';
 import { Website, Setting } from '@/types';
+import { setWebsites as setWebsitesStorage } from '@/utils/storage';
 import './Settings.scss';
 
 export function Settings() {
@@ -44,6 +45,7 @@ export function Settings() {
       const response = await api.getAllWebsites();
       if (response.status === 'success' && response.data) {
         setWebsites(response.data);
+        await setWebsitesStorage(response.data);
       }
     } catch {
       showToast('Failed to fetch websites', 'error');
@@ -117,7 +119,9 @@ export function Settings() {
     try {
       const response = await api.deleteWebsite(domain);
       if (response.status === 'success') {
-        setWebsites((prev) => prev.filter((w) => w.domain !== domain));
+        const newWebsites = websites.filter((w) => w.domain !== domain);
+        setWebsites(newWebsites);
+        await setWebsitesStorage(newWebsites);
         showToast('Website deleted successfully', 'success');
       } else {
         showToast(response.message || 'Failed to delete website', 'error');
