@@ -7,6 +7,36 @@ browser.action.onClicked.addListener(() => {
   });
 });
 
+// ============================================================
+// Website Strategies for Auto-Add Manga Button
+// ============================================================
+
+/**
+ * Strategy interface for extracting manga info from supported websites.
+ * Each strategy defines:
+ * - domain: The website domain this strategy handles
+ * - buttonContainerSelector: CSS selector where the "Add manga" button should be appended
+ * - getNameSelector: CSS selector to find the manga name
+ * - getCoverSelector: CSS selector to find the cover image
+ */
+const websiteStrategies = {
+  'www.mangaread.org': {
+    domain: 'www.mangaread.org',
+    buttonContainerSelector: '.summary_content',
+    nameSelector: '.post-title > h1',
+    coverSelector: '.summary_image img',
+  },
+};
+
+/**
+ * Get the strategy for a given domain
+ * @param {string} domain - The website domain
+ * @returns {object|null} The strategy object or null if not supported
+ */
+function getWebsiteStrategy(domain) {
+  return websiteStrategies[domain] || null;
+}
+
 // Context menu IDs
 const MENU_ADD_WEBSITE = 'manga-sync-add-website';
 const MENU_ADD_MANGA = 'manga-sync-add-manga';
@@ -204,6 +234,7 @@ async function handleCreateManga({ name, cover, coverSmall, domain, path }) {
 }
 
 // Auto-update manga chapter when navigating to a chapter page
+// Also inject auto-add button on supported websites
 browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.url) {
     try {
@@ -216,6 +247,24 @@ browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
       const apiUrl = storage.apiUrl;
       const bearerToken = storage.bearerToken;
 
+      // Check if this is a supported website for auto-add button
+      const strategy = getWebsiteStrategy(domain);
+      if (strategy) {
+        const matchingWebsite = websites.find(w => domain === w.domain || domain.endsWith('.' + w.domain));
+
+        // Only show auto-add button if:
+        // 1. The website is registered in our system
+        // 2. The current path is NOT already tracked as a source
+        if (matchingWebsite) {
+          const websiteSources = sources.filter(s => s.website_id === matchingWebsite.id);
+          const pathAlreadyTracked = websiteSources.some(source => url.pathname.startsWith(source.path));
+
+          if (!pathAlreadyTracked) {
+            await injectAutoAddButton(tabId, domain, url.pathname, strategy);
+          }
+        }
+      }
+
       if (!apiUrl || !bearerToken) return;
 
       // 1. Detect if the visited domain exist in the websites
@@ -224,13 +273,13 @@ browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
       // 2. Check if the url path matches with the source
       const websiteSources = sources.filter(s => s.website_id === matchingWebsite.id);
-      
+
       for (const source of websiteSources) {
         if (url.pathname.startsWith(source.path)) {
           // 3. Extract the chapter from the rest of the url
           const remainingPath = url.pathname.slice(source.path.length);
           let chapter = remainingPath.startsWith('/') ? remainingPath.slice(1) : remainingPath;
-          
+
           // Remove trailing slash if present
           if (chapter.endsWith('/')) {
             chapter = chapter.slice(0, -1);
@@ -258,3 +307,40 @@ browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     }
   }
 });
+
+// Inject the auto-add button on supported websites
+async function injectAutoAddButton(tabId, domain, path, strategy) {
+  try {
+    // Inject the content script and CSS
+    await browser.scripting.executeScript({
+      target: { tabId },
+      files: ['content-add-manga.js'],
+    });
+
+    await browser.scripting.insertCSS({
+      target: { tabId },
+      files: ['content-add-manga.css'],
+    });
+
+    // Get websites for the form
+    const storage = await browser.storage.local.get(['websites']);
+
+    // Send message to content script to inject the auto-add button
+    await browser.tabs.sendMessage(tabId, {
+      type: 'MANGA_SYNC_INJECT_AUTO_BUTTON',
+      data: {
+        domain,
+        path,
+        websites: storage.websites || [],
+        strategy: {
+          buttonContainerSelector: strategy.buttonContainerSelector,
+          nameSelector: strategy.nameSelector,
+          coverSelector: strategy.coverSelector,
+        },
+      },
+    });
+  } catch (error) {
+    // Ignore errors (e.g., page doesn't have the expected elements)
+    console.debug('Manga Sync: Could not inject auto-add button', error);
+  }
+}

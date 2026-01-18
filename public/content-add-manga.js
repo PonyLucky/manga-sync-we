@@ -6,14 +6,109 @@
 
   let formContainer = null;
   let formData = null;
+  let autoAddButton = null;
 
   // Listen for messages from background script
   browser.runtime.onMessage.addListener((message) => {
     if (message.type === 'MANGA_SYNC_SHOW_FORM') {
       formData = message.data;
       showForm();
+    } else if (message.type === 'MANGA_SYNC_INJECT_AUTO_BUTTON') {
+      injectAutoAddButton(message.data);
     }
   });
+
+  /**
+   * Extract manga name from the page using the strategy selector
+   * @param {string} selector - CSS selector to find the name element
+   * @returns {string} The manga name, trimmed of whitespace
+   */
+  function extractMangaName(selector) {
+    const el = document.querySelector(selector);
+    return el ? el.textContent.trim() : '';
+  }
+
+  /**
+   * Extract cover URLs from the page using the strategy selector
+   * @param {string} selector - CSS selector to find the cover image
+   * @returns {{ cover: string, coverSmall: string }} The cover URLs
+   */
+  function extractCovers(selector) {
+    const img = document.querySelector(selector);
+    if (!img) return { cover: '', coverSmall: '' };
+
+    const srcset = img.getAttribute('srcset');
+    const src = img.getAttribute('src') || '';
+
+    if (!srcset) {
+      return { cover: src, coverSmall: src };
+    }
+
+    // Parse srcset: "url1 193w, url2 125w"
+    const srcsetParts = srcset.split(',').map(s => s.trim());
+    const parsed = srcsetParts.map(part => {
+      const [url, descriptor] = part.split(/\s+/);
+      const width = parseInt(descriptor) || 0;
+      return { url, width };
+    }).filter(p => p.url);
+
+    if (parsed.length === 0) {
+      return { cover: src, coverSmall: src };
+    }
+
+    // Sort by width descending to get largest first
+    parsed.sort((a, b) => b.width - a.width);
+
+    const cover = parsed[0]?.url || src;
+    const coverSmall = parsed.length > 1 ? parsed[parsed.length - 1]?.url : cover;
+
+    return { cover, coverSmall };
+  }
+
+  /**
+   * Inject the auto-add button on supported websites
+   * @param {object} data - Data from background script
+   */
+  function injectAutoAddButton(data) {
+    const { domain, path, websites, strategy } = data;
+
+    // Don't inject if button already exists
+    if (autoAddButton && document.body.contains(autoAddButton)) return;
+
+    // Find the container to append the button
+    const container = document.querySelector(strategy.buttonContainerSelector);
+    if (!container) return;
+
+    // Create the button
+    autoAddButton = document.createElement('button');
+    autoAddButton.id = 'manga-sync-auto-add-btn';
+    autoAddButton.className = 'manga-sync-auto-add-btn';
+    autoAddButton.textContent = 'Add manga to Manga Sync';
+    autoAddButton.type = 'button';
+
+    // Handle button click
+    autoAddButton.addEventListener('click', () => {
+      // Extract manga info using strategy selectors
+      const name = extractMangaName(strategy.nameSelector);
+      const covers = extractCovers(strategy.coverSelector);
+
+      // Store form data and show form with pre-filled values
+      formData = {
+        domain,
+        path,
+        websites,
+        prefill: {
+          name,
+          cover: covers.cover,
+          coverSmall: covers.coverSmall,
+        },
+      };
+      showForm();
+    });
+
+    // Append button to container
+    container.appendChild(autoAddButton);
+  }
 
   function showForm() {
     // Remove existing form if any
@@ -78,6 +173,13 @@
 
     // Pre-fill path
     document.getElementById('manga-sync-path').value = formData.path;
+
+    // Pre-fill from strategy extraction if available
+    if (formData.prefill) {
+      document.getElementById('manga-sync-name').value = formData.prefill.name || '';
+      document.getElementById('manga-sync-cover').value = formData.prefill.cover || '';
+      document.getElementById('manga-sync-cover-small').value = formData.prefill.coverSmall || '';
+    }
 
     // Event listeners
     document.getElementById('manga-sync-close').addEventListener('click', hideForm);
