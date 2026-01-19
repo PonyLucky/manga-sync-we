@@ -4,7 +4,48 @@ A Firefox Web Extension for managing and syncing your manga reading progress.
 
 ## Showcase
 
+### Extension Webpage
 
+1) **Settings page** - Configure the API URL and Bearer Token.
+
+![extension-settings.png](screenshots/extension-settings.png)
+
+2) **Library page** - View added mangas in a responsive grid layout.
+
+![extension-library.png](screenshots/extension-library.png)
+
+3) **Manga detail** - Manage sources, track reading progress and continue reading,
+
+![extension-manga-detail.png](screenshots/extension-manga-detail.png)
+
+4) **Add source** - Add a new source to a manga.
+
+![extension-manga-detail-add-source.png](screenshots/extension-manga-detail-add-source.png)
+
+5) Manga detail with 2 sources.
+
+![extension-manga-detail-with-sources.png](screenshots/extension-manga-detail-with-sources.png)
+
+6) After refreshing unread chapters (with cron (each day), after reading a chapter or manually).
+
+![extension-library-after-unread-chapters-refresh-or-cron.png](screenshots/extension-library-after-unread-chapters-refresh-or-cron.png)
+
+7) Manga detail with multiple sources and history.
+
+![extension-manga-detail-complete-data.png](screenshots/extension-manga-detail-complete-data.png)
+
+### On a website
+
+1) **Add a domain** - Add a new domain to the extension, visible only if the domain is not already added.
+![website-add-domain.png](screenshots/website-add-domain.png)
+
+2) **Add a manga** - Add a new manga to the library (with the right click menu or the button on supported websites).
+
+![website-add-manga.png](screenshots/website-add-manga.png)
+
+3) **Add a manga form** - Fill the form to add a new manga (pre-filled on supported websites).
+
+![website-add-manga-form.png](screenshots/website-add-manga-form.png)
 
 ## Features
 
