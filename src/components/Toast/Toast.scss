@@ -45,6 +45,14 @@
     }
   }
 
+  &--warning {
+    border-left: 3px solid $color-warning;
+
+    .toast__icon {
+      color: $color-warning;
+    }
+  }
+
   &__icon {
     flex-shrink: 0;
   }
