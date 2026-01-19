@@ -10,6 +10,8 @@ import {
   CreateSourcePayload,
   UpdateMangaPayload,
   RefreshUnreadData,
+  KeyAge,
+  KeyRefreshResponse,
 } from '@/types';
 
 export class MangaAPI {
@@ -123,6 +125,40 @@ export class MangaAPI {
   // Settings endpoints
   async getAllSettings(): Promise<ApiResponse<Record<string, string>>> {
     return this.request<Record<string, string>>('get', '/setting');
+  }
+
+  async updateSetting(key: string, value: string): Promise<ApiResponse<null>> {
+    try {
+      const response = await this.client.patch<ApiResponse<null>>(
+        `/setting/${encodeURIComponent(key)}`,
+        value,
+        {
+          headers: {
+            'Content-Type': 'text/plain',
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      const axiosError = error as import('axios').AxiosError<ApiResponse<null>>;
+      if (axiosError.response) {
+        return axiosError.response.data;
+      }
+      return {
+        status: 'error',
+        message: axiosError.message || 'Network error',
+        data: null,
+      };
+    }
+  }
+
+  // Key endpoints
+  async getKeyAge(): Promise<ApiResponse<KeyAge>> {
+    return this.request<KeyAge>('get', '/key');
+  }
+
+  async refreshKey(): Promise<ApiResponse<KeyRefreshResponse>> {
+    return this.request<KeyRefreshResponse>('post', '/key');
   }
 }
 

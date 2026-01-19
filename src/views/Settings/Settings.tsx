@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Save, Plus, Trash2, Globe, Key, Server, RefreshCw } from 'lucide-react';
+import { Save, Plus, Trash2, Globe, Key, Server, RefreshCw, AlertTriangle, Copy, Check, Shield } from 'lucide-react';
 import { useApi, useToast } from '@/context';
-import { Header, Button, Input } from '@/components';
+import { Header, Button, Input, Modal } from '@/components';
 import { Website, Setting } from '@/types';
 import { setWebsites as setWebsitesStorage } from '@/utils/storage';
 import './Settings.scss';
@@ -23,6 +23,14 @@ export function Settings() {
   const [settings, setSettings] = useState<Setting[]>([]);
   const [isLoadingSettings, setIsLoadingSettings] = useState(false);
 
+  const [keyAge, setKeyAge] = useState<number | null>(null);
+  const [isLoadingKeyAge, setIsLoadingKeyAge] = useState(false);
+  const [isRefreshingKey, setIsRefreshingKey] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showNewKeyModal, setShowNewKeyModal] = useState(false);
+  const [newKey, setNewKey] = useState('');
+  const [keyCopied, setKeyCopied] = useState(false);
+
   useEffect(() => {
     if (!isApiLoading) {
       setApiUrl(config.apiUrl);
@@ -34,6 +42,7 @@ export function Settings() {
     if (isConfigured && api && !isApiLoading) {
       fetchWebsites();
       fetchSettings();
+      fetchKeyAge();
     }
   }, [isConfigured, api, isApiLoading]);
 
@@ -71,6 +80,71 @@ export function Settings() {
       showToast('Failed to fetch settings', 'error');
     } finally {
       setIsLoadingSettings(false);
+    }
+  };
+
+  const fetchKeyAge = async () => {
+    if (!api) return;
+
+    setIsLoadingKeyAge(true);
+    try {
+      const response = await api.getKeyAge();
+      if (response.status === 'success' && response.data) {
+        setKeyAge(response.data.age_in_days);
+      }
+    } catch {
+      showToast('Failed to fetch key age', 'error');
+    } finally {
+      setIsLoadingKeyAge(false);
+    }
+  };
+
+  const getSettingValue = (key: string): number => {
+    const setting = settings.find((s) => s.key === key);
+    return setting ? parseInt(setting.value, 10) : 0;
+  };
+
+  const warningThreshold = getSettingValue('TTL_KEY_WARNING') || 90;
+  const limitThreshold = getSettingValue('TTL_KEY_LIMIT') || 365;
+  const daysUntilExpiry = keyAge !== null ? limitThreshold - keyAge : null;
+  const showWarning = keyAge !== null && keyAge > warningThreshold;
+  const isCritical = daysUntilExpiry !== null && daysUntilExpiry < 30;
+
+  const handleRefreshKey = async () => {
+    if (!api) return;
+
+    setIsRefreshingKey(true);
+    setShowConfirmModal(false);
+    try {
+      const response = await api.refreshKey();
+      if (response.status === 'success' && response.data) {
+        const key = response.data.key;
+        setNewKey(key);
+        setShowNewKeyModal(true);
+        setKeyCopied(false);
+
+        await updateConfig({ apiUrl: config.apiUrl, bearerToken: key });
+        setBearerToken(key);
+        setKeyAge(0);
+
+        showToast('API key refreshed successfully', 'success');
+      } else {
+        showToast(response.message || 'Failed to refresh key', 'error');
+      }
+    } catch {
+      showToast('Failed to refresh key', 'error');
+    } finally {
+      setIsRefreshingKey(false);
+    }
+  };
+
+  const handleCopyKey = async () => {
+    try {
+      await navigator.clipboard.writeText(newKey);
+      setKeyCopied(true);
+      showToast('Key copied to clipboard', 'success');
+    } catch {
+      showToast('Failed to copy key', 'error');
     }
   };
 
@@ -196,6 +270,67 @@ export function Settings() {
             <section className="settings__section">
               <div className="settings__section-header">
                 <h2>
+                  <Shield size={20} />
+                  API Key Status
+                </h2>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={fetchKeyAge}
+                  disabled={isLoadingKeyAge}
+                >
+                  <RefreshCw
+                    size={16}
+                    className={isLoadingKeyAge ? 'spinning' : ''}
+                  />
+                </Button>
+              </div>
+
+              {isLoadingKeyAge || isLoadingSettings ? (
+                <div className="settings__loading">Loading key status...</div>
+              ) : keyAge === null ? (
+                <div className="settings__empty">Unable to fetch key status</div>
+              ) : (
+                <div className="settings__key-status">
+                  <div className="settings__key-info">
+                    <div className="settings__key-age">
+                      <span className="settings__key-label">Key Age</span>
+                      <span className="settings__key-value">{keyAge} days</span>
+                    </div>
+                    <div className="settings__key-expiry">
+                      <span className="settings__key-label">Days Until Expiry</span>
+                      <span className={`settings__key-value ${isCritical ? 'settings__key-value--critical' : showWarning ? 'settings__key-value--warning' : ''}`}>
+                        {daysUntilExpiry} days
+                      </span>
+                    </div>
+                  </div>
+
+                  {showWarning && (
+                    <div className={`settings__key-warning ${isCritical ? 'settings__key-warning--critical' : ''}`}>
+                      <AlertTriangle size={18} />
+                      <span>
+                        {isCritical
+                          ? `Your API key expires in ${daysUntilExpiry} days. Refresh it immediately to avoid losing access.`
+                          : `Your API key expires in ${daysUntilExpiry} days. Consider refreshing it soon.`}
+                      </span>
+                    </div>
+                  )}
+
+                  <Button
+                    variant={showWarning ? 'primary' : 'outline'}
+                    onClick={() => setShowConfirmModal(true)}
+                    loading={isRefreshingKey}
+                  >
+                    <RefreshCw size={18} />
+                    Refresh API Key
+                  </Button>
+                </div>
+              )}
+            </section>
+
+            <section className="settings__section">
+              <div className="settings__section-header">
+                <h2>
                   <Globe size={20} />
                   Websites
                 </h2>
@@ -295,6 +430,64 @@ export function Settings() {
           </>
         )}
       </main>
+
+      <Modal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        title="Refresh API Key"
+        size="sm"
+      >
+        <div className="settings__modal-content">
+          <div className="settings__modal-warning">
+            <AlertTriangle size={24} />
+            <p>
+              Refreshing your API key will immediately invalidate the current key.
+              Make sure to save the new key when it's displayed.
+            </p>
+          </div>
+          <div className="settings__modal-actions">
+            <Button variant="outline" onClick={() => setShowConfirmModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={handleRefreshKey} loading={isRefreshingKey}>
+              Refresh Key
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={showNewKeyModal}
+        onClose={() => setShowNewKeyModal(false)}
+        title="New API Key"
+        size="md"
+      >
+        <div className="settings__modal-content">
+          <div className="settings__modal-warning">
+            <AlertTriangle size={24} />
+            <p>
+              Copy your new API key now. You won't be able to see it again.
+              The extension has been automatically updated with the new key.
+            </p>
+          </div>
+          <div className="settings__new-key">
+            <code className="settings__new-key-value">{newKey}</code>
+            <Button
+              variant={keyCopied ? 'primary' : 'outline'}
+              size="sm"
+              onClick={handleCopyKey}
+            >
+              {keyCopied ? <Check size={16} /> : <Copy size={16} />}
+              {keyCopied ? 'Copied' : 'Copy'}
+            </Button>
+          </div>
+          <div className="settings__modal-actions">
+            <Button variant="primary" onClick={() => setShowNewKeyModal(false)}>
+              Done
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

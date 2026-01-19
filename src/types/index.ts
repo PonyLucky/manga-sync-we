@@ -84,3 +84,11 @@ export interface RefreshUnreadData {
   errors: number;
   results: RefreshUnreadResult[];
 }
+
+export interface KeyAge {
+  age_in_days: number;
+}
+
+export interface KeyRefreshResponse {
+  key: string;
+}

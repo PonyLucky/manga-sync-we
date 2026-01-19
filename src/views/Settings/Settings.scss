@@ -107,6 +107,126 @@
       font-family: monospace;
     }
   }
+
+  &__key-status {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  &__key-info {
+    display: flex;
+    gap: $spacing-lg;
+  }
+
+  &__key-age,
+  &__key-expiry {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    padding: $spacing-md;
+    background: $color-bg-glass;
+    border-radius: $radius-md;
+    border: 1px solid $color-border;
+    flex: 1;
+  }
+
+  &__key-label {
+    font-size: 0.875rem;
+    color: $color-text-muted;
+  }
+
+  &__key-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $color-text-primary;
+
+    &--warning {
+      color: $color-warning;
+    }
+
+    &--critical {
+      color: $color-error;
+    }
+  }
+
+  &__key-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-sm;
+    padding: $spacing-md;
+    background: rgba($color-warning, 0.1);
+    border: 1px solid rgba($color-warning, 0.3);
+    border-radius: $radius-md;
+    color: $color-warning;
+    font-size: 0.9375rem;
+
+    svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    &--critical {
+      background: rgba($color-error, 0.1);
+      border-color: rgba($color-error, 0.3);
+      color: $color-error;
+    }
+  }
+
+  &__modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  &__modal-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-md;
+    padding: $spacing-md;
+    background: rgba($color-warning, 0.1);
+    border: 1px solid rgba($color-warning, 0.3);
+    border-radius: $radius-md;
+    color: $color-warning;
+
+    svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+    }
+  }
+
+  &__modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-sm;
+  }
+
+  &__new-key {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-md;
+    background: $color-bg-glass;
+    border-radius: $radius-md;
+    border: 1px solid $color-border;
+
+    &-value {
+      flex: 1;
+      font-family: monospace;
+      font-size: 0.875rem;
+      color: $color-text-primary;
+      word-break: break-all;
+      padding: $spacing-sm;
+      background: $color-bg-secondary;
+      border-radius: $radius-sm;
+    }
+  }
 }
 
 .spinning {
