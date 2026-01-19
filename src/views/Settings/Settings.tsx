@@ -22,6 +22,8 @@ export function Settings() {
 
   const [settings, setSettings] = useState<Setting[]>([]);
   const [isLoadingSettings, setIsLoadingSettings] = useState(false);
+  const [editedSettings, setEditedSettings] = useState<Record<string, string>>({});
+  const [savingSettingKey, setSavingSettingKey] = useState<string | null>(null);
 
   const [keyAge, setKeyAge] = useState<number | null>(null);
   const [isLoadingKeyAge, setIsLoadingKeyAge] = useState(false);
@@ -75,6 +77,11 @@ export function Settings() {
           value: String(value),
         }));
         setSettings(settingsArray);
+        const edited: Record<string, string> = {};
+        settingsArray.forEach((s) => {
+          edited[s.key] = s.value;
+        });
+        setEditedSettings(edited);
       }
     } catch {
       showToast('Failed to fetch settings', 'error');
@@ -145,6 +152,39 @@ export function Settings() {
       showToast('Key copied to clipboard', 'success');
     } catch {
       showToast('Failed to copy key', 'error');
+    }
+  };
+
+  const handleSettingChange = (key: string, value: string) => {
+    setEditedSettings((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const hasSettingChanged = (key: string): boolean => {
+    const original = settings.find((s) => s.key === key);
+    return original ? original.value !== editedSettings[key] : false;
+  };
+
+  const handleSaveSetting = async (key: string) => {
+    if (!api) return;
+
+    const value = editedSettings[key];
+    if (value === undefined) return;
+
+    setSavingSettingKey(key);
+    try {
+      const response = await api.updateSetting(key, value);
+      if (response.status === 'success') {
+        setSettings((prev) =>
+          prev.map((s) => (s.key === key ? { ...s, value } : s))
+        );
+        showToast(`Setting "${key}" updated successfully`, 'success');
+      } else {
+        showToast(response.message || `Failed to update setting "${key}"`, 'error');
+      }
+    } catch {
+      showToast(`Failed to update setting "${key}"`, 'error');
+    } finally {
+      setSavingSettingKey(null);
     }
   };
 
@@ -394,7 +434,7 @@ export function Settings() {
             <section className="settings__section">
               <div className="settings__section-header">
                 <h2>
-                  <Key size={20} />
+                  <Server size={20} />
                   Server Settings
                 </h2>
                 <Button
@@ -417,11 +457,25 @@ export function Settings() {
               ) : (
                 <ul className="settings__server-settings">
                   {settings.map((setting) => (
-                    <li key={setting.key} className="settings__setting">
+                    <li key={setting.key} className="settings__setting settings__setting--editable">
                       <span className="settings__setting-key">{setting.key}</span>
-                      <span className="settings__setting-value">
-                        {setting.value}
-                      </span>
+                      <div className="settings__setting-edit">
+                        <input
+                          type="text"
+                          className="settings__setting-input"
+                          value={editedSettings[setting.key] ?? setting.value}
+                          onChange={(e) => handleSettingChange(setting.key, e.target.value)}
+                        />
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => handleSaveSetting(setting.key)}
+                          loading={savingSettingKey === setting.key}
+                          disabled={!hasSettingChanged(setting.key)}
+                        >
+                          <Save size={14} />
+                        </Button>
+                      </div>
                     </li>
                   ))}
                 </ul>
