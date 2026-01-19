@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import { X, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 import './Toast.scss';
 
-export type ToastType = 'success' | 'error' | 'info';
+export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
 interface ToastProps {
   message: string;
@@ -15,6 +15,7 @@ const icons = {
   success: CheckCircle,
   error: AlertCircle,
   info: Info,
+  warning: AlertTriangle,
 };
 
 export function Toast({ message, type, onClose, duration = 4000 }: ToastProps) {
