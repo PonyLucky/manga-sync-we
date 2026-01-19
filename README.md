@@ -47,6 +47,18 @@ A Firefox Web Extension for managing and syncing your manga reading progress.
 
 ![website-add-manga-form.png](screenshots/website-add-manga-form.png)
 
+### Refresh the Bearer Token
+
+1) **In the settings page** - Modal to confirm the refresh.
+
+![extension-settings-key-refresh-confirm.png](screenshots/extension-settings-key-refresh-confirm.png)
+
+2) **Result** - Modal to show the new token.
+
+![extension-settings-key-refresh-result.png](screenshots/extension-settings-key-refresh-result.png)
+
+*If the token is too old, you'll see banners that will ask you to refresh it.*
+
 ## Features
 
 - **Library Management**: View all your manga in a responsive grid layout
