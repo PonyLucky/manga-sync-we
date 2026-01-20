@@ -110,6 +110,39 @@
     container.appendChild(autoAddButton);
   }
 
+  function createFormGroup(labelText, inputId, inputAttrs) {
+    const group = document.createElement('div');
+    group.className = 'manga-sync-form__group';
+
+    const label = document.createElement('label');
+    label.setAttribute('for', inputId);
+    label.textContent = labelText;
+    group.appendChild(label);
+
+    let input;
+    if (inputAttrs.tagName === 'select') {
+      input = document.createElement('select');
+      if (inputAttrs.options) {
+        inputAttrs.options.forEach(opt => {
+          const option = document.createElement('option');
+          option.value = opt.value;
+          option.textContent = opt.text;
+          input.appendChild(option);
+        });
+      }
+    } else {
+      input = document.createElement('input');
+      input.type = inputAttrs.type || 'text';
+      if (inputAttrs.placeholder) input.placeholder = inputAttrs.placeholder;
+      if (inputAttrs.required) input.required = true;
+    }
+    input.id = inputId;
+    input.autocomplete = 'off';
+    group.appendChild(input);
+
+    return group;
+  }
+
   function showForm() {
     // Remove existing form if any
     if (formContainer) {
@@ -118,44 +151,79 @@
 
     formContainer = document.createElement('div');
     formContainer.id = 'manga-sync-form-container';
-    formContainer.innerHTML = `
-      <div class="manga-sync-form">
-        <div class="manga-sync-form__header">
-          <h2>Add Manga to Manga Sync</h2>
-          <button type="button" class="manga-sync-form__close" id="manga-sync-close">&times;</button>
-        </div>
-        <form id="manga-sync-add-form" autocomplete="off">
-          <div class="manga-sync-form__group">
-            <label for="manga-sync-name">Manga Name *</label>
-            <input type="text" id="manga-sync-name" placeholder="Enter manga name" required autocomplete="off" />
-          </div>
-          <div class="manga-sync-form__group">
-            <label for="manga-sync-cover">Cover URL *</label>
-            <input type="text" id="manga-sync-cover" placeholder="https://example.com/cover.jpg" required autocomplete="off" />
-          </div>
-          <div class="manga-sync-form__group">
-            <label for="manga-sync-cover-small">Small Cover URL *</label>
-            <input type="text" id="manga-sync-cover-small" placeholder="https://example.com/cover-small.jpg" required autocomplete="off" />
-          </div>
-          <div class="manga-sync-form__divider">Initial Source (Optional)</div>
-          <div class="manga-sync-form__group">
-            <label for="manga-sync-domain">Domain</label>
-            <select id="manga-sync-domain" autocomplete="off">
-              <option value="">Select a website</option>
-            </select>
-          </div>
-          <div class="manga-sync-form__group">
-            <label for="manga-sync-path">Path</label>
-            <input type="text" id="manga-sync-path" placeholder="/manga/example-manga" autocomplete="off" />
-          </div>
-          <div class="manga-sync-form__actions">
-            <button type="button" class="manga-sync-btn manga-sync-btn--ghost" id="manga-sync-cancel">Cancel</button>
-            <button type="submit" class="manga-sync-btn manga-sync-btn--primary" id="manga-sync-submit">Add Manga</button>
-          </div>
-          <div class="manga-sync-form__message" id="manga-sync-message"></div>
-        </form>
-      </div>
-    `;
+
+    // Create form wrapper
+    const formWrapper = document.createElement('div');
+    formWrapper.className = 'manga-sync-form';
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'manga-sync-form__header';
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Add Manga to Manga Sync';
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'manga-sync-form__close';
+    closeBtn.id = 'manga-sync-close';
+    closeBtn.textContent = '\u00D7';
+    header.appendChild(h2);
+    header.appendChild(closeBtn);
+    formWrapper.appendChild(header);
+
+    // Form
+    const form = document.createElement('form');
+    form.id = 'manga-sync-add-form';
+    form.autocomplete = 'off';
+
+    // Form groups
+    form.appendChild(createFormGroup('Manga Name *', 'manga-sync-name', {
+      type: 'text', placeholder: 'Enter manga name', required: true
+    }));
+    form.appendChild(createFormGroup('Cover URL *', 'manga-sync-cover', {
+      type: 'text', placeholder: 'https://example.com/cover.jpg', required: true
+    }));
+    form.appendChild(createFormGroup('Small Cover URL *', 'manga-sync-cover-small', {
+      type: 'text', placeholder: 'https://example.com/cover-small.jpg', required: true
+    }));
+
+    // Divider
+    const divider = document.createElement('div');
+    divider.className = 'manga-sync-form__divider';
+    divider.textContent = 'Initial Source (Optional)';
+    form.appendChild(divider);
+
+    form.appendChild(createFormGroup('Domain', 'manga-sync-domain', {
+      tagName: 'select', options: [{ value: '', text: 'Select a website' }]
+    }));
+    form.appendChild(createFormGroup('Path', 'manga-sync-path', {
+      type: 'text', placeholder: '/manga/example-manga'
+    }));
+
+    // Actions
+    const actions = document.createElement('div');
+    actions.className = 'manga-sync-form__actions';
+    const cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'manga-sync-btn manga-sync-btn--ghost';
+    cancelBtn.id = 'manga-sync-cancel';
+    cancelBtn.textContent = 'Cancel';
+    const submitBtn = document.createElement('button');
+    submitBtn.type = 'submit';
+    submitBtn.className = 'manga-sync-btn manga-sync-btn--primary';
+    submitBtn.id = 'manga-sync-submit';
+    submitBtn.textContent = 'Add Manga';
+    actions.appendChild(cancelBtn);
+    actions.appendChild(submitBtn);
+    form.appendChild(actions);
+
+    // Message
+    const message = document.createElement('div');
+    message.className = 'manga-sync-form__message';
+    message.id = 'manga-sync-message';
+    form.appendChild(message);
+
+    formWrapper.appendChild(form);
+    formContainer.appendChild(formWrapper);
 
     document.body.insertBefore(formContainer, document.body.firstChild);
 
