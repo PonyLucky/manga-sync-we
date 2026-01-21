@@ -24,3 +24,5 @@ package-lock.json
 # Local env files
 .env
 .env.local
+
+*.zip
