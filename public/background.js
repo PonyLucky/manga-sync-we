@@ -1,6 +1,8 @@
 // Background script for Manga Sync Web Extension
 // Opens a new tab with the main interface when the extension icon is clicked
 
+import browser from "webextension-polyfill";
+
 browser.action.onClicked.addListener(() => {
   browser.tabs.create({
     url: browser.runtime.getURL('index.html'),
@@ -41,30 +43,38 @@ function getWebsiteStrategy(domain) {
 const MENU_ADD_WEBSITE = 'manga-sync-add-website';
 const MENU_ADD_MANGA = 'manga-sync-add-manga';
 
+const HAS_CONTEXT_MENUS = browser.contextMenus !== undefined;
+
 // Create context menus on install
 browser.runtime.onInstalled.addListener(() => {
-  browser.contextMenus.create({
-    id: MENU_ADD_WEBSITE,
-    title: 'Add this website to Manga Sync',
-    contexts: ['page'],
-  });
+  if (HAS_CONTEXT_MENUS) {
+    browser.contextMenus.create({
+      id: MENU_ADD_WEBSITE,
+      title: 'Add this website to Manga Sync',
+      contexts: ['page'],
+    });
 
-  browser.contextMenus.create({
-    id: MENU_ADD_MANGA,
-    title: 'Add this page as a manga',
-    contexts: ['page'],
-  });
-});
-
-// Update context menu visibility based on current tab
-browser.tabs.onActivated.addListener(updateContextMenus);
-browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
-  if (changeInfo.status === 'complete') {
-    updateContextMenus();
+    browser.contextMenus.create({
+      id: MENU_ADD_MANGA,
+      title: 'Add this page as a manga',
+      contexts: ['page'],
+    });
   }
 });
 
+// Update context menu visibility based on current tab
+if (HAS_CONTEXT_MENUS) {
+  browser.tabs.onActivated.addListener(updateContextMenus);
+  browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
+    if (changeInfo.status === 'complete') {
+      updateContextMenus();
+    }
+  });
+}
+
 async function updateContextMenus() {
+  if (!HAS_CONTEXT_MENUS) return;
+
   try {
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
     if (!tab?.url) return;
@@ -102,18 +112,20 @@ async function updateContextMenus() {
 }
 
 // Handle context menu clicks
-browser.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (!tab?.url) return;
+if (HAS_CONTEXT_MENUS) {
+  browser.contextMenus.onClicked.addListener(async (info, tab) => {
+    if (!tab?.url) return;
 
-  const url = new URL(tab.url);
-  const domain = url.hostname;
+    const url = new URL(tab.url);
+    const domain = url.hostname;
 
-  if (info.menuItemId === MENU_ADD_WEBSITE) {
-    await handleAddWebsite(domain);
-  } else if (info.menuItemId === MENU_ADD_MANGA) {
-    await handleAddManga(tab.id, domain, url.pathname);
-  }
-});
+    if (info.menuItemId === MENU_ADD_WEBSITE) {
+      await handleAddWebsite(domain);
+    } else if (info.menuItemId === MENU_ADD_MANGA) {
+      await handleAddManga(tab.id, domain, url.pathname);
+    }
+  });
+}
 
 async function handleAddWebsite(domain) {
   try {
