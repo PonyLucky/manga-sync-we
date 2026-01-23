@@ -14,8 +14,11 @@ export async function getStorageData(): Promise<StorageData> {
     STORAGE_KEYS.BEARER_TOKEN,
   ]);
 
+  // Remove trailing slashes from apiUrl to prevent double slashes in API paths
+  const apiUrl = (result[STORAGE_KEYS.API_URL] || '').replace(/\/+$/, '');
+
   return {
-    apiUrl: result[STORAGE_KEYS.API_URL] || '',
+    apiUrl,
     bearerToken: result[STORAGE_KEYS.BEARER_TOKEN] || '',
   };
 }
@@ -24,7 +27,8 @@ export async function setStorageData(data: Partial<StorageData>): Promise<void> 
   const storageData: Record<string, string> = {};
 
   if (data.apiUrl !== undefined) {
-    storageData[STORAGE_KEYS.API_URL] = data.apiUrl;
+    // Remove trailing slashes to prevent double slashes in API paths
+    storageData[STORAGE_KEYS.API_URL] = data.apiUrl.replace(/\/+$/, '');
   }
   if (data.bearerToken !== undefined) {
     storageData[STORAGE_KEYS.BEARER_TOKEN] = data.bearerToken;
