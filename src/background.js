@@ -3,6 +3,10 @@
 
 import browser from "webextension-polyfill";
 
+// Cache to track last sent chapter per manga to avoid duplicate PATCH requests
+// Key: manga_id, Value: chapter_number
+const lastSentChapterCache = new Map();
+
 browser.action.onClicked.addListener(() => {
   browser.tabs.create({
     url: browser.runtime.getURL('index.html'),
@@ -314,6 +318,15 @@ browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
           }
 
           if (chapter) {
+            // Check if we already sent this chapter for this manga
+            const cacheKey = source.manga_id;
+            const lastSentChapter = lastSentChapterCache.get(cacheKey);
+
+            if (lastSentChapter === chapter) {
+              // Skip duplicate request
+              break;
+            }
+
             // 4. PATCH /manga/{id} with the chapter and website_domain in the body
             await fetch(`${apiUrl}/manga/${source.manga_id}`, {
               method: 'PATCH',
@@ -326,6 +339,9 @@ browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
                 website_domain: matchingWebsite.domain
               })
             });
+
+            // Update cache after successful request
+            lastSentChapterCache.set(cacheKey, chapter);
           }
           break;
         }
