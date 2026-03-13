@@ -39,11 +39,12 @@
 
   // Variants
   &--primary {
-    background: linear-gradient(135deg, $color-accent-gradient-start, $color-accent-gradient-end);
+    background: $color-bg-hover;
     color: $color-text-primary;
     box-shadow: $shadow-sm;
 
     &:hover:not(:disabled) {
+      background: color-mix(in srgb, $color-bg-hover, white 10%);
       box-shadow: $shadow-glow;
       transform: translateY(-1px);
     }
@@ -90,7 +91,7 @@
     color: $color-text-primary;
 
     &:hover:not(:disabled) {
-      background: color.adjust($color-error, $lightness: -10%);
+      background: color-mix(in srgb, $color-error, black 10%);
       box-shadow: 0 0 15px rgba($color-error, 0.4);
     }
   }

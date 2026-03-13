@@ -6,6 +6,7 @@ const STORAGE_KEYS = {
   BEARER_TOKEN: 'bearerToken',
   WEBSITES: 'websites',
   SOURCES: 'sources',
+  THEME: 'theme',
 } as const;
 
 export async function getStorageData(): Promise<StorageData> {
@@ -64,4 +65,13 @@ export async function getSources(): Promise<Source[]> {
 
 export async function setSources(sources: Source[]): Promise<void> {
   await browser.storage.local.set({ [STORAGE_KEYS.SOURCES]: sources });
+}
+
+export async function getTheme(): Promise<string> {
+  const result = await browser.storage.local.get(STORAGE_KEYS.THEME);
+  return result[STORAGE_KEYS.THEME] || 'default';
+}
+
+export async function setTheme(theme: string): Promise<void> {
+  await browser.storage.local.set({ [STORAGE_KEYS.THEME]: theme });
 }

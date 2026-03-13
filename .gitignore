@@ -13,6 +13,8 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+.junie/
+.idea/
 
 # Logs
 *.log
