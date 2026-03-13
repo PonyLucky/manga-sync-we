@@ -1,14 +1,34 @@
-import { useState, useEffect } from 'react';
-import { Save, Plus, Trash2, Globe, Key, Server, RefreshCw, AlertTriangle, Copy, Check, Shield } from 'lucide-react';
-import { useApi, useToast } from '@/context';
-import { Header, Button, Input, Modal } from '@/components';
-import { Website, Setting } from '@/types';
-import { setWebsites as setWebsitesStorage } from '@/utils/storage';
-import './Settings.scss';
+import { useState, useEffect } from "react";
+import {
+  Save,
+  Plus,
+  Trash2,
+  Globe,
+  Key,
+  Server,
+  RefreshCw,
+  AlertTriangle,
+  Copy,
+  Check,
+  Shield,
+  Palette,
+} from "lucide-react";
+import { useApi, useToast, useTheme } from "@/context";
+import { Header, Button, Input, Modal } from "@/components";
+import { Website, Setting } from "@/types";
+import { setWebsites as setWebsitesStorage } from "@/utils/storage";
+import "./Settings.scss";
 
 export function Settings() {
-  const { api, config, updateConfig, isConfigured, isLoading: isApiLoading } = useApi();
+  const {
+    api,
+    config,
+    updateConfig,
+    isConfigured,
+    isLoading: isApiLoading,
+  } = useApi();
   const { showToast } = useToast();
+  const { theme, setTheme } = useTheme();
 
   const [apiUrl, setApiUrl] = useState(config.apiUrl);
   const [bearerToken, setBearerToken] = useState(config.bearerToken);
@@ -16,13 +36,17 @@ export function Settings() {
 
   const [websites, setWebsites] = useState<Website[]>([]);
   const [isLoadingWebsites, setIsLoadingWebsites] = useState(false);
-  const [deletingWebsiteDomain, setDeletingWebsiteDomain] = useState<string | null>(null);
-  const [newDomain, setNewDomain] = useState('');
+  const [deletingWebsiteDomain, setDeletingWebsiteDomain] = useState<
+    string | null
+  >(null);
+  const [newDomain, setNewDomain] = useState("");
   const [isAddingDomain, setIsAddingDomain] = useState(false);
 
   const [settings, setSettings] = useState<Setting[]>([]);
   const [isLoadingSettings, setIsLoadingSettings] = useState(false);
-  const [editedSettings, setEditedSettings] = useState<Record<string, string>>({});
+  const [editedSettings, setEditedSettings] = useState<Record<string, string>>(
+    {},
+  );
   const [savingSettingKey, setSavingSettingKey] = useState<string | null>(null);
 
   const [keyAge, setKeyAge] = useState<number | null>(null);
@@ -30,7 +54,7 @@ export function Settings() {
   const [isRefreshingKey, setIsRefreshingKey] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showNewKeyModal, setShowNewKeyModal] = useState(false);
-  const [newKey, setNewKey] = useState('');
+  const [newKey, setNewKey] = useState("");
   const [keyCopied, setKeyCopied] = useState(false);
 
   useEffect(() => {
@@ -54,12 +78,12 @@ export function Settings() {
     setIsLoadingWebsites(true);
     try {
       const response = await api.getAllWebsites();
-      if (response.status === 'success' && response.data) {
+      if (response.status === "success" && response.data) {
         setWebsites(response.data);
         await setWebsitesStorage(response.data);
       }
     } catch {
-      showToast('Failed to fetch websites', 'error');
+      showToast("Failed to fetch websites", "error");
     } finally {
       setIsLoadingWebsites(false);
     }
@@ -71,11 +95,13 @@ export function Settings() {
     setIsLoadingSettings(true);
     try {
       const response = await api.getAllSettings();
-      if (response.status === 'success' && response.data) {
-        const settingsArray = Object.entries(response.data).map(([key, value]) => ({
-          key,
-          value: String(value),
-        }));
+      if (response.status === "success" && response.data) {
+        const settingsArray = Object.entries(response.data).map(
+          ([key, value]) => ({
+            key,
+            value: String(value),
+          }),
+        );
         setSettings(settingsArray);
         const edited: Record<string, string> = {};
         settingsArray.forEach((s) => {
@@ -84,7 +110,7 @@ export function Settings() {
         setEditedSettings(edited);
       }
     } catch {
-      showToast('Failed to fetch settings', 'error');
+      showToast("Failed to fetch settings", "error");
     } finally {
       setIsLoadingSettings(false);
     }
@@ -96,11 +122,11 @@ export function Settings() {
     setIsLoadingKeyAge(true);
     try {
       const response = await api.getKeyAge();
-      if (response.status === 'success' && response.data) {
+      if (response.status === "success" && response.data) {
         setKeyAge(response.data.age_in_days);
       }
     } catch {
-      showToast('Failed to fetch key age', 'error');
+      showToast("Failed to fetch key age", "error");
     } finally {
       setIsLoadingKeyAge(false);
     }
@@ -111,8 +137,8 @@ export function Settings() {
     return setting ? parseInt(setting.value, 10) : 0;
   };
 
-  const warningThreshold = getSettingValue('TTL_KEY_WARNING') || 90;
-  const limitThreshold = getSettingValue('TTL_KEY_LIMIT') || 365;
+  const warningThreshold = getSettingValue("TTL_KEY_WARNING") || 90;
+  const limitThreshold = getSettingValue("TTL_KEY_LIMIT") || 365;
   const daysUntilExpiry = keyAge !== null ? limitThreshold - keyAge : null;
   const showWarning = keyAge !== null && keyAge > warningThreshold;
   const isCritical = daysUntilExpiry !== null && daysUntilExpiry < 30;
@@ -124,7 +150,7 @@ export function Settings() {
     setShowConfirmModal(false);
     try {
       const response = await api.refreshKey();
-      if (response.status === 'success' && response.data) {
+      if (response.status === "success" && response.data) {
         const key = response.data.key;
         setNewKey(key);
         setShowNewKeyModal(true);
@@ -134,12 +160,12 @@ export function Settings() {
         setBearerToken(key);
         setKeyAge(0);
 
-        showToast('API key refreshed successfully', 'success');
+        showToast("API key refreshed successfully", "success");
       } else {
-        showToast(response.message || 'Failed to refresh key', 'error');
+        showToast(response.message || "Failed to refresh key", "error");
       }
     } catch {
-      showToast('Failed to refresh key', 'error');
+      showToast("Failed to refresh key", "error");
     } finally {
       setIsRefreshingKey(false);
     }
@@ -149,9 +175,9 @@ export function Settings() {
     try {
       await navigator.clipboard.writeText(newKey);
       setKeyCopied(true);
-      showToast('Key copied to clipboard', 'success');
+      showToast("Key copied to clipboard", "success");
     } catch {
-      showToast('Failed to copy key', 'error');
+      showToast("Failed to copy key", "error");
     }
   };
 
@@ -173,16 +199,19 @@ export function Settings() {
     setSavingSettingKey(key);
     try {
       const response = await api.updateSetting(key, value);
-      if (response.status === 'success') {
+      if (response.status === "success") {
         setSettings((prev) =>
-          prev.map((s) => (s.key === key ? { ...s, value } : s))
+          prev.map((s) => (s.key === key ? { ...s, value } : s)),
         );
-        showToast(`Setting "${key}" updated successfully`, 'success');
+        showToast(`Setting "${key}" updated successfully`, "success");
       } else {
-        showToast(response.message || `Failed to update setting "${key}"`, 'error');
+        showToast(
+          response.message || `Failed to update setting "${key}"`,
+          "error",
+        );
       }
     } catch {
-      showToast(`Failed to update setting "${key}"`, 'error');
+      showToast(`Failed to update setting "${key}"`, "error");
     } finally {
       setSavingSettingKey(null);
     }
@@ -190,16 +219,16 @@ export function Settings() {
 
   const handleSaveConfig = async () => {
     if (!apiUrl.trim() || !bearerToken.trim()) {
-      showToast('Please fill in both API URL and Bearer Token', 'error');
+      showToast("Please fill in both API URL and Bearer Token", "error");
       return;
     }
 
     setIsSaving(true);
     try {
       await updateConfig({ apiUrl, bearerToken });
-      showToast('Configuration saved successfully', 'success');
+      showToast("Configuration saved successfully", "success");
     } catch {
-      showToast('Failed to save configuration', 'error');
+      showToast("Failed to save configuration", "error");
     } finally {
       setIsSaving(false);
     }
@@ -211,16 +240,16 @@ export function Settings() {
     setIsAddingDomain(true);
     try {
       const response = await api.createWebsite(newDomain);
-      if (response.status === 'success') {
-        setNewDomain('');
-        showToast('Website added successfully', 'success');
+      if (response.status === "success") {
+        setNewDomain("");
+        showToast("Website added successfully", "success");
         fetchWebsites();
         fetchSettings();
       } else {
-        showToast(response.message || 'Failed to add website', 'error');
+        showToast(response.message || "Failed to add website", "error");
       }
     } catch {
-      showToast('Failed to add website', 'error');
+      showToast("Failed to add website", "error");
     } finally {
       setIsAddingDomain(false);
     }
@@ -232,16 +261,16 @@ export function Settings() {
     setDeletingWebsiteDomain(domain);
     try {
       const response = await api.deleteWebsite(domain);
-      if (response.status === 'success') {
+      if (response.status === "success") {
         const newWebsites = websites.filter((w) => w.domain !== domain);
         setWebsites(newWebsites);
         await setWebsitesStorage(newWebsites);
-        showToast('Website deleted successfully', 'success');
+        showToast("Website deleted successfully", "success");
       } else {
-        showToast(response.message || 'Failed to delete website', 'error');
+        showToast(response.message || "Failed to delete website", "error");
       }
     } catch {
-      showToast('Failed to delete website', 'error');
+      showToast("Failed to delete website", "error");
     } finally {
       setDeletingWebsiteDomain(null);
     }
@@ -265,6 +294,58 @@ export function Settings() {
 
       <main className="settings__content">
         <h1 className="settings__title">Settings</h1>
+
+        <section className="settings__section">
+          <div className="settings__section-header">
+            <h2>
+              <Palette size={20} />
+              Appearance
+            </h2>
+          </div>
+          <div className="settings__appearance">
+            <div className="settings__theme-grid">
+              {[
+                {
+                  id: "default",
+                  label: "Default",
+                  colors: ["#0f172a", "#8b5cf6"],
+                },
+                {
+                  id: "dark",
+                  label: "Firefox Dark",
+                  colors: ["#1c1b22", "#00ddff"],
+                },
+                {
+                  id: "light",
+                  label: "Firefox Light",
+                  colors: ["#ffffff", "#0060df"],
+                },
+                {
+                  id: "ereader",
+                  label: "E-Reader",
+                  colors: ["#ffffff", "#000000"],
+                },
+              ].map((t) => (
+                <button
+                  key={t.id}
+                  className={`settings__theme-card ${theme === t.id ? "settings__theme-card--active" : ""}`}
+                  onClick={() => setTheme(t.id as any)}
+                >
+                  <div
+                    className="settings__theme-preview"
+                    style={{ backgroundColor: t.colors[0] }}
+                  >
+                    <div
+                      className="settings__theme-accent"
+                      style={{ backgroundColor: t.colors[1] }}
+                    />
+                  </div>
+                  <span className="settings__theme-label">{t.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
 
         <section className="settings__section">
           <div className="settings__section-header">
@@ -321,7 +402,7 @@ export function Settings() {
                 >
                   <RefreshCw
                     size={16}
-                    className={isLoadingKeyAge ? 'spinning' : ''}
+                    className={isLoadingKeyAge ? "spinning" : ""}
                   />
                 </Button>
               </div>
@@ -329,7 +410,9 @@ export function Settings() {
               {isLoadingKeyAge || isLoadingSettings ? (
                 <div className="settings__loading">Loading key status...</div>
               ) : keyAge === null ? (
-                <div className="settings__empty">Unable to fetch key status</div>
+                <div className="settings__empty">
+                  Unable to fetch key status
+                </div>
               ) : (
                 <div className="settings__key-status">
                   <div className="settings__key-info">
@@ -338,15 +421,21 @@ export function Settings() {
                       <span className="settings__key-value">{keyAge} days</span>
                     </div>
                     <div className="settings__key-expiry">
-                      <span className="settings__key-label">Days Until Expiry</span>
-                      <span className={`settings__key-value ${isCritical ? 'settings__key-value--critical' : showWarning ? 'settings__key-value--warning' : ''}`}>
+                      <span className="settings__key-label">
+                        Days Until Expiry
+                      </span>
+                      <span
+                        className={`settings__key-value ${isCritical ? "settings__key-value--critical" : showWarning ? "settings__key-value--warning" : ""}`}
+                      >
                         {daysUntilExpiry} days
                       </span>
                     </div>
                   </div>
 
                   {showWarning && (
-                    <div className={`settings__key-warning ${isCritical ? 'settings__key-warning--critical' : ''}`}>
+                    <div
+                      className={`settings__key-warning ${isCritical ? "settings__key-warning--critical" : ""}`}
+                    >
                       <AlertTriangle size={18} />
                       <span>
                         {isCritical
@@ -357,7 +446,7 @@ export function Settings() {
                   )}
 
                   <Button
-                    variant={showWarning ? 'primary' : 'outline'}
+                    variant={showWarning ? "primary" : "outline"}
                     onClick={() => setShowConfirmModal(true)}
                     loading={isRefreshingKey}
                   >
@@ -382,7 +471,7 @@ export function Settings() {
                 >
                   <RefreshCw
                     size={16}
-                    className={isLoadingWebsites ? 'spinning' : ''}
+                    className={isLoadingWebsites ? "spinning" : ""}
                   />
                 </Button>
               </div>
@@ -392,7 +481,7 @@ export function Settings() {
                   placeholder="mangasite.com"
                   value={newDomain}
                   onChange={(e) => setNewDomain(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddWebsite()}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddWebsite()}
                   fullWidth
                 />
                 <Button
@@ -445,7 +534,7 @@ export function Settings() {
                 >
                   <RefreshCw
                     size={16}
-                    className={isLoadingSettings ? 'spinning' : ''}
+                    className={isLoadingSettings ? "spinning" : ""}
                   />
                 </Button>
               </div>
@@ -453,18 +542,27 @@ export function Settings() {
               {isLoadingSettings ? (
                 <div className="settings__loading">Loading settings...</div>
               ) : settings.length === 0 ? (
-                <div className="settings__empty">No server settings available</div>
+                <div className="settings__empty">
+                  No server settings available
+                </div>
               ) : (
                 <ul className="settings__server-settings">
                   {settings.map((setting) => (
-                    <li key={setting.key} className="settings__setting settings__setting--editable">
-                      <span className="settings__setting-key">{setting.key}</span>
+                    <li
+                      key={setting.key}
+                      className="settings__setting settings__setting--editable"
+                    >
+                      <span className="settings__setting-key">
+                        {setting.key}
+                      </span>
                       <div className="settings__setting-edit">
                         <input
                           type="text"
                           className="settings__setting-input"
                           value={editedSettings[setting.key] ?? setting.value}
-                          onChange={(e) => handleSettingChange(setting.key, e.target.value)}
+                          onChange={(e) =>
+                            handleSettingChange(setting.key, e.target.value)
+                          }
                         />
                         <Button
                           variant="primary"
@@ -495,15 +593,22 @@ export function Settings() {
           <div className="settings__modal-warning">
             <AlertTriangle size={24} />
             <p>
-              Refreshing your API key will immediately invalidate the current key.
-              Make sure to save the new key when it's displayed.
+              Refreshing your API key will immediately invalidate the current
+              key. Make sure to save the new key when it's displayed.
             </p>
           </div>
           <div className="settings__modal-actions">
-            <Button variant="outline" onClick={() => setShowConfirmModal(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setShowConfirmModal(false)}
+            >
               Cancel
             </Button>
-            <Button variant="danger" onClick={handleRefreshKey} loading={isRefreshingKey}>
+            <Button
+              variant="danger"
+              onClick={handleRefreshKey}
+              loading={isRefreshingKey}
+            >
               Refresh Key
             </Button>
           </div>
@@ -520,19 +625,19 @@ export function Settings() {
           <div className="settings__modal-warning">
             <AlertTriangle size={24} />
             <p>
-              Copy your new API key now. You won't be able to see it again.
-              The extension has been automatically updated with the new key.
+              Copy your new API key now. You won't be able to see it again. The
+              extension has been automatically updated with the new key.
             </p>
           </div>
           <div className="settings__new-key">
             <code className="settings__new-key-value">{newKey}</code>
             <Button
-              variant={keyCopied ? 'primary' : 'outline'}
+              variant={keyCopied ? "primary" : "outline"}
               size="sm"
               onClick={handleCopyKey}
             >
               {keyCopied ? <Check size={16} /> : <Copy size={16} />}
-              {keyCopied ? 'Copied' : 'Copy'}
+              {keyCopied ? "Copied" : "Copy"}
             </Button>
           </div>
           <div className="settings__modal-actions">
