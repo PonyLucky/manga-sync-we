@@ -88,8 +88,8 @@ async function updateContextMenus() {
     const pathname = url.pathname;
 
     const storage = await browser.storage.local.get(['websites', 'sources']);
-    const websites = storage.websites || [];
-    const sources = storage.sources || [];
+    const websites = Array.isArray(storage.websites) ? storage.websites : [];
+    const sources = Array.isArray(storage.sources) ? storage.sources : [];
 
     const matchingWebsite = websites.find(w => domain === w.domain || domain.endsWith('.' + w.domain));
     const websiteExists = !!matchingWebsite;
@@ -151,9 +151,11 @@ async function handleAddWebsite(domain) {
 
     if (response.ok) {
       const data = await response.json();
-      // Update local storage
-      websites.push(data);
-      await browser.storage.local.set({ websites });
+      if (data.status === 'success' && data.data) {
+        // Update local storage
+        websites.push(data.data);
+        await browser.storage.local.set({ websites });
+      }
       
       // Also refresh the whole list to be sure and consistent with other actions
       try {
@@ -245,7 +247,12 @@ async function handleCreateManga({ name, cover, coverSmall, domain, path }) {
       return { success: false, error: 'Failed to create manga' };
     }
 
-    const manga = await mangaResponse.json();
+    const mangaData = await mangaResponse.json();
+    if (mangaData.status !== 'success') {
+      return { success: false, error: mangaData.message || 'Failed to create manga' };
+    }
+
+    const manga = mangaData.data;
 
     // Refresh sources in local storage
     if (domain && path) {
@@ -253,8 +260,10 @@ async function handleCreateManga({ name, cover, coverSmall, domain, path }) {
         headers: { Authorization: `Bearer ${bearerToken}` },
       });
       if (sourcesResponse.ok) {
-        const sources = await sourcesResponse.json();
-        await browser.storage.local.set({ sources });
+        const sourcesData = await sourcesResponse.json();
+        if (sourcesData.status === 'success' && sourcesData.data) {
+          await browser.storage.local.set({ sources: sourcesData.data });
+        }
       }
     }
 
@@ -274,8 +283,8 @@ browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
       const domain = url.hostname;
 
       const storage = await browser.storage.local.get(['websites', 'sources', 'apiUrl', 'bearerToken']);
-      const websites = storage.websites || [];
-      const sources = storage.sources || [];
+      const websites = Array.isArray(storage.websites) ? storage.websites : [];
+      const sources = Array.isArray(storage.sources) ? storage.sources : [];
       const apiUrl = storage.apiUrl;
       const bearerToken = storage.bearerToken;
 
