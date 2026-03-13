@@ -27,6 +27,7 @@ export function MangaDetails() {
   const [websites, setWebsites] = useState<Website[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedSourceId, setSelectedSourceId] = useState<number | null>(null);
+  const [showAllHistory, setShowAllHistory] = useState(false);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAddSourceModalOpen, setIsAddSourceModalOpen] = useState(false);
@@ -354,18 +355,34 @@ export function MangaDetails() {
               {history.length === 0 ? (
                 <p className="manga-details__empty">No reading history yet</p>
               ) : (
-                <ul className="manga-details__history">
-                  {history.map((chapter) => (
-                    <li key={chapter.id} className="manga-details__chapter">
-                      <span className="manga-details__chapter-number">
-                        Chapter {cleanChapterNumber(chapter.number)}
-                      </span>
-                      <span className="manga-details__chapter-date">
-                        {formatDate(chapter.updated_at)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                <>
+                  <ul className="manga-details__history">
+                    {history
+                      .slice(0, showAllHistory ? history.length : 5)
+                      .map((chapter) => (
+                        <li key={chapter.id} className="manga-details__chapter">
+                          <span className="manga-details__chapter-number">
+                            Chapter {cleanChapterNumber(chapter.number)}
+                          </span>
+                          <span className="manga-details__chapter-date">
+                            {formatDate(chapter.updated_at)}
+                          </span>
+                        </li>
+                      ))}
+                  </ul>
+                  {history.length > 5 && !showAllHistory && (
+                    <div className="manga-details__show-more">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowAllHistory(true)}
+                        fullWidth
+                      >
+                        Show More
+                      </Button>
+                    </div>
+                  )}
+                </>
               )}
             </section>
 

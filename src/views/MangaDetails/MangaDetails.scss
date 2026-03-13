@@ -244,6 +244,10 @@
       color: $color-text-muted;
     }
   }
+  
+  &__show-more {
+    margin-top: $spacing-md;
+  }
 
   &__danger-zone {
     margin-top: $spacing-2xl;
