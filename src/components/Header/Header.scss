@@ -6,11 +6,12 @@
     top: 0;
     z-index: $z-dropdown;
     border-bottom: 1px solid $color-border;
+    backdrop-filter: brightness(50%) blur(10px);
 
     &__container {
         max-width: $breakpoint-xl;
         margin: 0 auto;
-        padding: $spacing-md $spacing-lg;
+        padding: $spacing-sm $spacing-lg;
         display: flex;
         align-items: center;
         justify-content: space-between;
