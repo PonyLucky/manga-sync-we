@@ -12,6 +12,7 @@ import {
   Check,
   Shield,
   Palette,
+  ExternalLink,
 } from "lucide-react";
 import { useApi, useToast, useTheme } from "@/context";
 import { Header, Button, Input, Modal } from "@/components";
@@ -375,14 +376,26 @@ export function Settings() {
               fullWidth
             />
 
-            <Button
-              variant="primary"
-              onClick={handleSaveConfig}
-              loading={isSaving}
-            >
-              <Save size={18} />
-              Save Configuration
-            </Button>
+            <div className="settings__form-actions">
+              <Button
+                variant="primary"
+                onClick={handleSaveConfig}
+                loading={isSaving}
+              >
+                <Save size={18} />
+                Save Configuration
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={() => window.open(apiUrl, "_blank")}
+                disabled={!apiUrl.trim()}
+                title="To check if this is the right URL and/or to authorize the certificate"
+              >
+                <ExternalLink size={18} />
+                Open API URL
+              </Button>
+            </div>
           </div>
         </section>
 

@@ -107,6 +107,15 @@
     display: flex;
     flex-direction: column;
     gap: $spacing-md;
+
+    &-actions {
+      display: flex;
+      gap: $spacing-md;
+
+      > .button {
+        flex: 1;
+      }
+    }
   }
 
   &__add-website {
