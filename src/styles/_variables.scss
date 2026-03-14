@@ -28,6 +28,9 @@
     --shadow-color-lg: rgba(0, 0, 0, 0.5);
     --shadow-glow-color: rgba(139, 92, 246, 0.3);
     --shadow-glow-strong-color: rgba(139, 92, 246, 0.5);
+
+    --header-bg: inherit;
+    --header-backdrop-filter: brightness(50%) blur(10px);
 }
 
 .theme-dark {
@@ -53,6 +56,8 @@
 
     --shadow-glow-color: rgba(0, 221, 255, 0.3);
     --shadow-glow-strong-color: rgba(0, 221, 255, 0.5);
+
+    --header-backdrop-filter: brightness(50%) blur(10px);
 }
 
 .theme-light {
@@ -80,6 +85,8 @@
     --shadow-color-lg: rgba(0, 0, 0, 0.2);
     --shadow-glow-color: rgba(0, 96, 223, 0.2);
     --shadow-glow-strong-color: rgba(0, 96, 223, 0.3);
+
+    --header-backdrop-filter: brightness(150%) blur(10px);
 }
 
 .theme-ereader {
@@ -107,6 +114,9 @@
     --shadow-color-lg: transparent;
     --shadow-glow-color: transparent;
     --shadow-glow-strong-color: transparent;
+
+    --header-bg: white;
+    --header-backdrop-filter: inherit;
 }
 
 // SCSS variables pointing to CSS Custom Properties

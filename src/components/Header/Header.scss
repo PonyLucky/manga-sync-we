@@ -6,7 +6,8 @@
     top: 0;
     z-index: $z-dropdown;
     border-bottom: 1px solid $color-border;
-    backdrop-filter: brightness(50%) blur(10px);
+    background-color: var(--header-bg);
+    backdrop-filter: var(--header-backdrop-filter);
 
     &__container {
         max-width: $breakpoint-xl;
