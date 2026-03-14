@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Manga } from '@/types';
-import './MangaCard.scss';
+import { useState } from "react";
+import { Manga } from "@/types";
+import "./MangaCard.scss";
 
 interface MangaCardProps {
   manga: Manga;
@@ -12,20 +12,26 @@ export function MangaCard({ manga, onClick }: MangaCardProps) {
   const [imageError, setImageError] = useState(false);
 
   const unreadCount = manga.number_unread_chapter;
+  const initials = manga.name
+    .split(" ", 2)
+    .map((w) => w.charAt(0).toUpperCase())
+    .join("");
 
   return (
     <article className="manga-card" onClick={onClick}>
       <div className="manga-card__image-container">
-        {!imageLoaded && !imageError && <div className="manga-card__skeleton" />}
+        {!imageLoaded && !imageError && (
+          <div className="manga-card__skeleton" />
+        )}
         {imageError ? (
           <div className="manga-card__placeholder">
-            <span>{manga.name.charAt(0).toUpperCase()}</span>
+            <span>{initials}</span>
           </div>
         ) : (
           <img
             src={manga.cover_small || manga.cover}
             alt={manga.name}
-            className={`manga-card__image ${imageLoaded ? 'manga-card__image--loaded' : ''}`}
+            className={`manga-card__image ${imageLoaded ? "manga-card__image--loaded" : ""}`}
             loading="lazy"
             onLoad={() => setImageLoaded(true)}
             onError={() => setImageError(true)}
@@ -33,7 +39,7 @@ export function MangaCard({ manga, onClick }: MangaCardProps) {
         )}
         {unreadCount != null && unreadCount > 0 && (
           <div className="manga-card__unread-badge">
-            {unreadCount > 99 ? '99+' : unreadCount}
+            {unreadCount > 99 ? "99+" : unreadCount}
           </div>
         )}
         <div className="manga-card__overlay">
