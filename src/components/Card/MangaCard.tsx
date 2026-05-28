@@ -18,7 +18,7 @@ export function MangaCard({ manga, onClick }: MangaCardProps) {
     .join("");
 
   return (
-    <article className="manga-card" onClick={onClick}>
+    <button className="manga-card" onClick={onClick}>
       <div className="manga-card__image-container">
         {!imageLoaded && !imageError && (
           <div className="manga-card__skeleton" />
@@ -51,6 +51,6 @@ export function MangaCard({ manga, onClick }: MangaCardProps) {
           {manga.name}
         </h3>
       </div>
-    </article>
+    </button>
   );
 }
