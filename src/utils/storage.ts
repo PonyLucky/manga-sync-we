@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill';
-import { StorageData, Website, Source } from '@/types';
+import { StorageData, Website, Source, CustomColors } from '@/types';
 
 const STORAGE_KEYS = {
   API_URL: 'apiUrl',
@@ -7,6 +7,7 @@ const STORAGE_KEYS = {
   WEBSITES: 'websites',
   SOURCES: 'sources',
   THEME: 'theme',
+  CUSTOM_COLORS: 'customColors',
 } as const;
 
 export async function getStorageData(): Promise<StorageData> {
@@ -74,4 +75,13 @@ export async function getTheme(): Promise<string> {
 
 export async function setTheme(theme: string): Promise<void> {
   await browser.storage.local.set({ [STORAGE_KEYS.THEME]: theme });
+}
+
+export async function getCustomColors(): Promise<CustomColors | null> {
+  const result = await browser.storage.local.get(STORAGE_KEYS.CUSTOM_COLORS);
+  return result[STORAGE_KEYS.CUSTOM_COLORS] || null;
+}
+
+export async function setCustomColors(colors: CustomColors): Promise<void> {
+  await browser.storage.local.set({ [STORAGE_KEYS.CUSTOM_COLORS]: colors });
 }

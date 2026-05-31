@@ -13,11 +13,24 @@ import {
   Shield,
   Palette,
   ExternalLink,
+  Download,
+  Upload,
 } from "lucide-react";
 import { useApi, useToast, useTheme } from "@/context";
 import { Header, Button, Input, Modal } from "@/components";
-import { Website, Setting } from "@/types";
+import { Website, Setting, CustomColors } from "@/types";
 import { setWebsites as setWebsitesStorage } from "@/utils/storage";
+import { DEFAULT_CUSTOM_COLORS } from "@/context/ThemeContext";
+
+const COLOR_FIELDS: { key: keyof CustomColors; label: string }[] = [
+  { key: "bgPrimary", label: "Background" },
+  { key: "bgSecondary", label: "Background Secondary" },
+  { key: "textPrimary", label: "Text" },
+  { key: "textSecondary", label: "Text Secondary" },
+  { key: "textMuted", label: "Text Muted" },
+  { key: "accentPrimary", label: "Accent" },
+  { key: "accentSecondary", label: "Accent Secondary" },
+];
 import "./Settings.scss";
 
 export function Settings() {
@@ -29,7 +42,8 @@ export function Settings() {
     isLoading: isApiLoading,
   } = useApi();
   const { showToast } = useToast();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, customColors, setCustomColors } = useTheme();
+  const [colorDraft, setColorDraft] = useState<Record<string, string>>({});
 
   const [apiUrl, setApiUrl] = useState(config.apiUrl);
   const [bearerToken, setBearerToken] = useState(config.bearerToken);
@@ -218,6 +232,67 @@ export function Settings() {
     }
   };
 
+  const getDisplayColor = (key: keyof CustomColors) =>
+    colorDraft[key] ?? customColors[key];
+
+  const handleHexInput = (key: keyof CustomColors, value: string) => {
+    setColorDraft((prev) => ({ ...prev, [key]: value }));
+    if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+      setCustomColors({ ...customColors, [key]: value });
+    }
+  };
+
+  const handleColorPicker = (key: keyof CustomColors, value: string) => {
+    setColorDraft((prev) => ({ ...prev, [key]: value }));
+    setCustomColors({ ...customColors, [key]: value });
+  };
+
+  const handleExportColors = () => {
+    const json = JSON.stringify(customColors, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "manga-sync-theme.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportColors = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json,application/json";
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const json = JSON.parse(ev.target?.result as string);
+          const validKeys = Object.keys(DEFAULT_CUSTOM_COLORS) as (keyof CustomColors)[];
+          const isValid = validKeys.every(
+            (k) => typeof json[k] === "string" && /^#[0-9A-Fa-f]{6}$/.test(json[k])
+          );
+          if (isValid) {
+            const newColors = validKeys.reduce(
+              (acc, k) => ({ ...acc, [k]: json[k] }),
+              {} as CustomColors
+            );
+            setCustomColors(newColors);
+            setColorDraft({});
+            showToast("Colors imported successfully", "success");
+          } else {
+            showToast("Invalid color file format", "error");
+          }
+        } catch {
+          showToast("Failed to parse color file", "error");
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
+
   const handleSaveConfig = async () => {
     if (!apiUrl.trim() || !bearerToken.trim()) {
       showToast("Please fill in both API URL and Bearer Token", "error");
@@ -326,6 +401,11 @@ export function Settings() {
                   label: "E-Reader",
                   colors: ["#ffffff", "#000000"],
                 },
+                {
+                  id: "custom",
+                  label: "Custom",
+                  colors: [customColors.bgPrimary, customColors.accentPrimary],
+                },
               ].map((t) => (
                 <button
                   key={t.id}
@@ -345,6 +425,50 @@ export function Settings() {
                 </button>
               ))}
             </div>
+
+            {theme === "custom" && (
+              <div className="settings__custom-colors">
+                {COLOR_FIELDS.map(({ key, label }) => (
+                  <div key={key} className="settings__color-row">
+                    <span className="settings__color-label">{label}</span>
+                    <input
+                      type="text"
+                      className="settings__color-hex-input"
+                      value={getDisplayColor(key)}
+                      onChange={(e) => handleHexInput(key, e.target.value)}
+                      maxLength={7}
+                      spellCheck={false}
+                    />
+                    <input
+                      type="color"
+                      className="settings__color-picker"
+                      value={customColors[key]}
+                      onChange={(e) => handleColorPicker(key, e.target.value)}
+                    />
+                  </div>
+                ))}
+                <div className="settings__custom-actions">
+                  <Button variant="outline" size="sm" onClick={handleExportColors}>
+                    <Download size={16} />
+                    Export
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={handleImportColors}>
+                    <Upload size={16} />
+                    Import
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setCustomColors(DEFAULT_CUSTOM_COLORS);
+                      setColorDraft({});
+                    }}
+                  >
+                    Reset
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </section>
 

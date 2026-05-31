@@ -47,6 +47,16 @@ export interface StorageData {
   bearerToken: string;
 }
 
+export interface CustomColors {
+  bgPrimary: string;
+  bgSecondary: string;
+  textPrimary: string;
+  textSecondary: string;
+  textMuted: string;
+  accentPrimary: string;
+  accentSecondary: string;
+}
+
 export interface CreateMangaPayload {
   name: string;
   cover: string;
