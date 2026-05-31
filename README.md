@@ -6,6 +6,9 @@ A Firefox Web Extension for managing and syncing your manga reading progress.
 
 ### Extension Webpage
 
+**NEW - Custom theme** - You can now setup your custom theme into manga-sync! (and import/export it for later.) Here is waht it looks like on my computer:
+![custom-theme-showcase.png](screenshots/extension-custom-theme-showcase.png)
+
 1) **Settings page** - Configure the API URL and Bearer Token.
 
 ![extension-settings.png](screenshots/extension-settings.png)
@@ -14,7 +17,7 @@ A Firefox Web Extension for managing and syncing your manga reading progress.
 
 ![extension-library.png](screenshots/extension-library.png)
 
-3) **Manga detail** - Manage sources, track reading progress and continue reading,
+3) **Manga detail** - Manage sources, track reading progress and continue reading.
 
 ![extension-manga-detail.png](screenshots/extension-manga-detail.png)
 
