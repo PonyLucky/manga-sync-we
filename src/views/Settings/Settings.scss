@@ -103,6 +103,76 @@
     }
   }
 
+  &__custom-colors {
+    margin-top: $spacing-md;
+    padding: $spacing-md;
+    background: $color-bg-glass;
+    border-radius: $radius-md;
+    border: 1px solid $color-border;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__color-row {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  &__color-label {
+    flex: 1;
+    font-size: 0.875rem;
+    color: $color-text-secondary;
+  }
+
+  &__color-hex-input {
+    width: 7.5rem;
+    padding: $spacing-xs $spacing-sm;
+    background: $color-bg-secondary;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    color: $color-text-primary;
+    font-family: monospace;
+    font-size: 0.875rem;
+    text-align: center;
+    transition: border-color $transition-fast;
+
+    &:focus {
+      outline: none;
+      border-color: $color-accent-primary;
+    }
+  }
+
+  &__color-picker {
+    width: 2rem;
+    height: 2rem;
+    padding: 2px;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    background: $color-bg-secondary;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color $transition-fast;
+
+    &:hover {
+      border-color: $color-border-hover;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $color-accent-primary;
+    }
+  }
+
+  &__custom-actions {
+    display: flex;
+    gap: $spacing-sm;
+    margin-top: $spacing-xs;
+    padding-top: $spacing-sm;
+    border-top: 1px solid $color-border;
+  }
+
   &__form {
     display: flex;
     flex-direction: column;
