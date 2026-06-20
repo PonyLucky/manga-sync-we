@@ -76,7 +76,7 @@
     right: $spacing-md;
     padding: $spacing-xs $spacing-sm;
     background: $color-accent-primary;
-    color: white;
+    color: $color-bg-primary;
     font-size: 0.875rem;
     font-weight: 600;
     border-radius: $radius-full;
@@ -201,7 +201,7 @@
     &-unread {
       font-size: 0.75rem;
       font-weight: 600;
-      color: white;
+      color: $color-bg-primary;
       background: $color-accent-primary;
       padding: 2px $spacing-xs;
       border-radius: $radius-sm;
@@ -244,7 +244,7 @@
       color: $color-text-muted;
     }
   }
-  
+
   &__show-more {
     margin-top: $spacing-md;
   }
