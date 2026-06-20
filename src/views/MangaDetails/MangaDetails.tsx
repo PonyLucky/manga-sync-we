@@ -157,7 +157,7 @@ export function MangaDetails() {
     if (!source) return;
 
     const domain = getWebsiteDomain(source.website_id);
-    const url = `https://${domain}${source.path.replace(/\/$/, '')}/${latestChapter.number}`;
+    const url = `https://${domain}${source.path.replace(/\/$/, '')}/${latestChapter.number}/`;
     window.open(url, '_blank');
   };
 
@@ -323,7 +323,7 @@ export function MangaDetails() {
                           size="sm"
                           onClick={() =>
                             window.open(
-                              `https://${getWebsiteDomain(source.website_id)}${source.path}`,
+                              `https://${getWebsiteDomain(source.website_id)}${source.path}/`,
                               '_blank'
                             )
                           }
